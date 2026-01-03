@@ -1,5 +1,6 @@
-﻿using ActivosFijos.Models;
+using ActivosFijos.Models;
 using System;
+using System.Diagnostics;
 using System.Linq;
 
 
@@ -35,8 +36,9 @@ namespace Helpers
             }
             catch (Exception e)
             {
-
-                throw e;
+                // TODO: Reemplazar por un proveedor de logging estructurado
+                Trace.TraceError($"Error autenticando usuario {user}: {e}");
+                rm.SetResponse(false, "No se pudo iniciar sesión en este momento. Inténtalo nuevamente.");
             }
 
             return rm;

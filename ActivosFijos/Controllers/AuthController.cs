@@ -14,6 +14,8 @@ namespace ActivosFijos.Controllers
             return View();
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public JsonResult Login(string username, string password_text)
         {
             var rm = Usuario.Auth(username, password_text);

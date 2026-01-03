@@ -46,6 +46,7 @@
 
                             @using (Html.BeginForm("Login", "Auth", FormMethod.Post))
                             {
+                                @Html.AntiForgeryToken()
 
                                 <div class="form-group mb-3">
                                     <label for="emailaddress">Usuario</label>
