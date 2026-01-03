@@ -1,0 +1,82 @@
+﻿@model IPagedList<ActivosFijos.Models.ViewModels.InventariosViewModel>
+@{
+    int contador = 1;
+}
+@if (Model.Any())
+{
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Folio Inventario</th>
+                    <th>Nombre Completo</th>
+                    <th>Adscripción</th>
+                    <th>Fecha Inventario</th>
+                    <th>Total Activos</th>
+                    <th>Encontrados</th>
+                    <th>Pendientes</th>
+                    <th>Detalle</th>
+                    <th>Imprimir</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (var inventario in Model)
+                {
+
+                    <tr>
+                        <td class="text-center">@contador</td>
+                        <td class="text-center"><strong>@(inventario.FolioInventario ?? "")</strong></td>
+                        <td class="text-center"><strong>@(inventario.NombreCompleto ?? "")</strong></td>
+                        <td class="text-center">@(inventario.Adscripcion ?? "")</td>
+                        <td class="text-center">@(inventario.FechaInventario.ToString("yyyy-MM-dd") ?? "")</td>
+                        <td class="text-center">@(inventario.TotalActivos.ToString() ?? "")</td>
+                        <td class="text-center">@(inventario.Encontrados.ToString() ?? "")</td>
+                        <td class="text-center">@(inventario.Pendientes.ToString() ?? "")</td>
+                        <td class="text-center"><a href="@Url.Action("DetalleInventario", new { id = inventario.FolioInventario })" class="btn btn-primary"><i class="icon-list"></i></a></td>
+                        <td class="text-center">
+                            <a href="#" class="btn btn-success" onclick="GenerarYAbrirPdf('@inventario.FolioInventario'); return false;">
+                                <i class="la la-print"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    contador++;
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row mt-3">
+            <div class="col-sm-8 col-12">
+                <span>Inventarios del <strong>@(Model.LastItemOnPage > 0 ? Model.FirstItemOnPage : 0)</strong> al  <strong>@Model.LastItemOnPage</strong> de <strong>@Model.TotalItemCount</strong> Registros</span>
+            </div>
+            <div class="col-12 text-right">
+                <div id="pagedList" class="pagedList" data-otf-target="#IndexList">
+                    @Html.PagedListPager(Model, iPagina => Url.Action("Inventarios", new { iPagina, iPerPage = ViewBag.PerPage, Nombres = ViewBag.Nombres, Adscripcion = ViewBag.Adscripcion, FechaInventario = ViewBag.Fecha }), PagedList.Mvc.PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(PagedListRenderOptions.ClassicPlusFirstAndLast,
+                                                                                                                           new AjaxOptions
+                                                                                                                           {
+                                                                                                                               HttpMethod = "post",
+                                                                                                                               InsertionMode = InsertionMode.Replace,
+                                                                                                                               UpdateTargetId = "resultadosBusqueda",
+                                                                                                                               OnBegin = "ShowLoading",
+                                                                                                                               OnComplete = "HideLoading"
+                                                                                                                           }))
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
+else
+{
+
+    <div class="alert alert-danger">
+        <p class="m-2">
+            <strong>No se encontraron Inventarios que mostrar</strong>
+        </p>
+    </div>
+}
+

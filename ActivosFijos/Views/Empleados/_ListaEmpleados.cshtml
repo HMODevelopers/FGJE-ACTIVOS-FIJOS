@@ -1,0 +1,71 @@
+﻿@model PagedList.IPagedList<ActivosFijos.Models.PLU_OP_Empleados>
+
+@if (Model.Count > 0)
+{
+    <div class="table-responsive">
+        <table class="table table-bordered" width="100%">
+            <tr>
+                <th>
+                    @Ajax.ActionLink("CVE_EMPLEADO", "Index", new { Orden = ViewBag.CveEmpleadoSortParam }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                </th>
+                <th>
+                    @Ajax.ActionLink("Apellido Paterno", "Index", new { Orden = ViewBag.ApePaternoSortParm }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                </th>
+                <th>
+                    @Ajax.ActionLink("Apellido Materno", "Index", new { Orden = ViewBag.ApeMaternoSortParm }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                </th>
+                <th>
+                    @Ajax.ActionLink("Nombre", "Index", new { Orden = ViewBag.NombreSortParm }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                </th>
+                <th>Estatus</th>
+                <th>Fecha Ingreso</th>
+                <th>Adscripción</th>
+                <th>Resguardo</th>
+            </tr>
+
+            @foreach (var empleado in Model)
+            {
+                <tr>
+                    <td>@empleado.NumeroEmpleado</td>
+                    <td>@empleado.ApellidoP</td>
+                    <td>@empleado.ApellidoM</td>
+                    <td>@empleado.Nombres</td>
+                    <td class="text-center">@empleado.EstatusRH</td>
+                    <td class="text-center">@empleado.FechaUAC</td>
+                    <td class="text-center">@Html.Raw($"<a href='{Url.Action("Adscripcion", new { id = empleado.IdEmpleado })}' class='btn btn-primary'><i class='la la-institution'></i></a>")</td>
+                    <td>
+                        @if (empleado.TieneResguardo)
+                        {
+                            @Html.Raw($"<center><a href='{Url.Action("ImprimirResguardo","Empleados", new { id = empleado.IdEmpleado })}' target='_blank' class='btn btn-success'><i class='la la-print'></i></a></center>")
+                        }
+                    </td>
+                </tr>
+            }
+        </table>
+
+        <div class="container-fluid">
+            <div class="row mt-3">
+                <div class="col-sm-8 col-12">
+                    <span>Empleados del <strong>@(Model.LastItemOnPage > 0 ? Model.FirstItemOnPage : 0)</strong> al  <strong>@Model.LastItemOnPage</strong> de <strong>@Model.TotalItemCount</strong> Registros</span>
+                </div>
+                <div class="col-sm-12 col-12 text-right">
+                    <div id="pagedList" class="pagedList" data-otf-target="#IndexList">
+                        @Html.PagedListPager(Model, iPagina => Url.Action("Index", new { iPagina, iPerPage = ViewBag.PerPage, Orden = ViewBag.Order }), PagedList.Mvc.PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(PagedListRenderOptions.ClassicPlusFirstAndLast,
+                              new AjaxOptions
+                              {
+                                  HttpMethod = "get",
+                                  InsertionMode = InsertionMode.Replace,
+                                  UpdateTargetId = "resultadosBusqueda",
+                                  OnBegin = "ShowLoading",
+                                  OnComplete = "HideLoading"
+                              }))
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> <!-- end table-responsive-->
+}
+else
+{
+    <p>No se encontraron resultados.</p>
+}

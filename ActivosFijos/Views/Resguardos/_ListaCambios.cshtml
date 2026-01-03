@@ -1,0 +1,121 @@
+﻿@model PagedList.IPagedList<ActivosFijos.Models.ViewModels.CambiosActivosViewModel>
+
+@if (Model.Count > 0)
+{
+    <div class="table-responsive">
+        <table class="table table-bordered" width="100%">
+            <thead>
+                <tr>
+                    <th>
+                        @Ajax.ActionLink("#", "ListarCambios", new { Orden = ViewBag.IdCambioActivosSortParam }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                        <i class="mdi mdi-sort"></i>
+                    </th>
+                    <th>
+                        @Ajax.ActionLink("Folio de Cambio", "ListarCambios", new { Orden = ViewBag.FolioCambioSortParam }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                        <i class="mdi mdi-sort"></i>
+                    </th>
+                    <th>
+                        @Ajax.ActionLink("Empleado Resguardante", "ListarCambios", new { Orden = ViewBag.NombreResguardanteSortParam }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                        <i class="mdi mdi-sort"></i>
+                    </th>
+                    <th>
+                        @Ajax.ActionLink("Numero Activos", "ListarCambios", new { Orden = ViewBag.NumeroActivosSortParam }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                        <i class="mdi mdi-sort"></i>
+                    </th>
+                    <th>
+                        @Ajax.ActionLink("Oficio de Cambio", "ListarCambios", new { Orden = ViewBag.OficioCambioSortParam }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                        <i class="mdi mdi-sort"></i>
+                    </th>
+                    <th>
+                        @Ajax.ActionLink("Usuario Responsable", "ListarCambios", new { Orden = ViewBag.UsuarioResponsableSortParam }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                        <i class="mdi mdi-sort"></i>
+                    </th>
+                    <th>
+                        @Ajax.ActionLink("Fecha de Cambio", "ListarCambios", new { Orden = ViewBag.FechaCambioSortParam }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                        <i class="mdi mdi-sort"></i>
+                    </th>
+                    <th><label></label>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(modelItem => item.IdCambioActivo)</td>
+                        <td><strong>@Html.DisplayFor(modelItem => item.FolioCambio)</strong></td>
+                        <td><strong>@Html.DisplayFor(modelItem => item.NombreReguardante)</strong></td>
+                        <td><center>@Html.DisplayFor(modelItem => item.NumeroCambios)</center></td>
+                        <td>
+                            <center>
+                                @if (!string.IsNullOrEmpty(item.OficioCambio) && item.OficioCambio != "Sin Oficio")
+                                {
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#pdfModal" onclick="cargarPDF('../Content/OficioCambios/@item.OficioCambio')">
+                                        <i class="fa fa-file-pdf text-danger" style="font-size: 24px;"></i>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span>Sin Oficio</span>
+                                }
+                            </center>
+                        </td>
+                        <th>@Html.DisplayFor(modelItem => item.UsuarioCambio)</th>
+                        <td><center>@Html.DisplayFor(modelItem => item.FechaCreacion)</center></td>
+                        <!-- Agrega más columnas aquí según tus necesidades -->
+                        <td>
+                            <center>
+                                <div class="btn-group dropdown">
+                                    <a href="javascript:void(0);" class="btn btn-success waves-effect waves-light table-action-btn dropdown-toggle arrow-none btn btn-light btn-sm" data-toggle="dropdown" aria-expanded="false"><i class="icon-options"></i></a>
+                                    <div class="dropdown-menu dropdown-menu-right">
+
+                                        @Html.Raw($"<a href='{Url.Action("DetallesCambios", new { id = item.FolioCambio })}' class='dropdown-item'><i class='icon-eye mr-2 text-muted font-18 vertical-middle'></i>Detalle Activo</a>")
+                                        @Html.Raw($"<a href='#' onclick='GenerarYAbrirPdf(\"{item.FolioCambio}\")' class='dropdown-item'><i class='icon-printer mr-2 text-muted font-18 vertical-middle'></i>Imprimir Resguardo</a>")
+                                    </div>
+                                </div>
+                            </center>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+
+
+        <div class="container-fluid">
+            <div class="row mt-3">
+
+                <div class="col-sm-8 col-12">
+                    <span>Activos del <strong>@(Model.LastItemOnPage > 0 ? Model.FirstItemOnPage : 0)</strong> al  <strong>@Model.LastItemOnPage</strong> de <strong>@Model.TotalItemCount</strong> Registros</span>
+                </div>
+                <div class="col-sm-12 col-12 text-right">
+                    <div id="pagedList" class="pagedList" data-otf-target="#IndexList">
+                        @Html.PagedListPager(Model, iPagina => Url.Action("ListarCambios", new { iPagina, iPerPage = ViewBag.PerPage, Orden = ViewBag.Order }), PagedList.Mvc.PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(PagedListRenderOptions.ClassicPlusFirstAndLast,
+                              new AjaxOptions
+                              {
+                                  HttpMethod = "get",
+                                  InsertionMode = InsertionMode.Replace,
+                                  UpdateTargetId = "resultadosBusqueda",
+                                  OnBegin = "ShowLoading",
+                                  OnComplete = "HideLoading"
+                              }))
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div> <!-- end table-responsive-->
+
+
+}
+else
+{
+
+    <p>No se encontraron resultados.</p>
+
+}
+
+
+
+

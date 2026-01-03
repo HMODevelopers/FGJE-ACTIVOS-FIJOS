@@ -1,0 +1,44 @@
+﻿@model PagedList.IPagedList<ActivosFijos.Models.PLU_OP_Empleados>
+@using PagedList.Mvc;
+
+@{
+    ViewBag.Title = "Buscar Empleados";
+}
+
+@Html.Partial("_Filtros")
+
+<div class="card">
+    <div class="card-body">
+        <div id="resultadosBusqueda">
+            <!-- Aquí se mostrarán los resultados de la búsqueda -->
+            @Html.Partial("_ListaEmpleados", Model) <!-- Agregar esto para mostrar los resultados iniciales -->
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ajax-unobtrusive/3.2.6/jquery.unobtrusive-ajax.min.js"></script>
+    <script src="~/Content/assets/js/pages/Filtros.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#executeButton").click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("EjecutarStoredProcedure", "Empleados")',
+                    success: function (data) {
+                        if (data.response) {
+                            window.location.href = data.href;
+                        } else {
+                            alert('Error: ' + data.message);
+                        }
+                    },
+                    error: function () {
+                        alert("Error al ejecutar el stored procedure.");
+                    }
+                });
+            });
+        });
+    </script>
+    
+}

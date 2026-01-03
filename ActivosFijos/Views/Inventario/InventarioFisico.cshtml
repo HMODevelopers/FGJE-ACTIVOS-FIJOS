@@ -1,0 +1,352 @@
+﻿@{
+    ViewBag.Title = "Inventario Físico";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="alert alert-primary">
+            <h5 class="m-0">Instrucciones</h5>
+            <p class="m-0">
+                Escanee o capture un número de inventario o número de serie para agregar activos a la lista.
+                Luego seleccione el empleado y presione <strong>Guardar</strong> para generar el inventario y el PDF.
+            </p>
+        </div>
+
+        <div class="row">
+
+            <!-- Búsqueda puntual -->
+            <div class="col-lg-2">
+                <div class="card">
+                    <div class="card-body">
+                        @using (Html.BeginForm("BuscarInventario", "Inventario", FormMethod.Post, new { id = "buscarInventario", autocomplete = "off" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <div class="form-group">
+                                <label for="NumeroInventario">Número de inventario</label>
+                                @Html.TextBox("NumeroInventario", null, new { @class = "form-control", id = "NumeroInventario", placeholder = "Ej. 12345" })
+                            </div>
+
+                            <div class="form-group">
+                                <label for="NumeroSerie">Número de serie</label>
+                                @Html.TextBox("NumeroSerie", null, new { @class = "form-control", id = "NumeroSerie", placeholder = "Ej. SN-XYZ-001" })
+                            </div>
+
+                            <div class="text-right">
+                                <button type="submit" class="btn btn-success waves-effect waves-light" id="BtnBuscar">
+                                    <i class="mdi mdi-magnify"></i> Buscar
+                                </button>
+                            </div>
+                        }
+
+                        <div id="noResultsMessage" style="display:none;">
+                            <div class="alert alert-warning mt-3 mb-0">
+                                <strong><i class="mdi mdi-alert-outline mr-2"></i>Atención:</strong>
+                                No se encontraron resultados.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel principal -->
+            <div class="col-lg-10">
+                <div class="card">
+                    <div class="card-body">
+
+                        <div class="alert alert-primary">
+                            <h5 class="m-0"><strong><i class="mdi mdi-account-search-outline mr-2"></i>Empleado</strong></h5>
+                            <p class="m-0">Seleccione el empleado al que se le realizará el inventario.</p>
+                        </div>
+
+                        <div class="form-row mb-3">
+                            <div class="form-group col-lg-12">
+                                <label for="employee-search">Buscar empleado</label>
+                                <select id="employee-search" name="NumeroEmpleado" class="form-control select2" style="width:100%;"></select>
+                                <small id="empleado_error" style="display:none;" class="badge badge-danger mt-1">Seleccione un empleado.</small>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="mb-0">Activos agregados</h5>
+                            <span class="badge badge-secondary" id="badgeTotal">0 activos</span>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered table-hover">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th style="width:80px;">ID</th>
+                                        <th>Nombre Empleado</th>
+                                        <th>Número Inventario</th>
+                                        <th>Descripción</th>
+                                        <th>Número de Serie</th>
+                                        <th>Categoría</th>
+                                        <th>Marca</th>
+                                        <th style="width:60px;">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="activosTableBody">
+                                    <!-- filas dinámicas -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="mt-3">
+                            <button type="button" class="btn btn-success" id="Guardar">
+                                <i class="mdi mdi-content-save"></i> Guardar
+                            </button>
+                            <button type="button" class="btn btn-outline-danger" id="Cancelar">
+                                <i class="mdi mdi-close-circle-outline"></i> Cancelar
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function () {
+
+          // ======= Token anti-forgery =======
+          var antiForgery = $('input[name="__RequestVerificationToken"]').val();
+          $.ajaxSetup({ headers: { 'RequestVerificationToken': antiForgery } });
+
+          // ======= Estado en memoria =======
+          const activosSet = new Set();
+          const $tablaBody = $('#activosTableBody');
+          const $noResults = $('#noResultsMessage');
+          const $badgeTotal = $('#badgeTotal');
+          function updateBadge() { $badgeTotal.text(`${activosSet.size} activo${activosSet.size === 1 ? '' : 's'}`); }
+
+          // ======= Select2 Empleados =======
+          $('#employee-search').select2({
+            placeholder: "Seleccione un empleado",
+            allowClear: true,
+            width: 'resolve',
+            ajax: {
+              url: '@Url.Action("GetEmpleados", "Resguardos")',
+              dataType: 'json',
+              delay: 150,
+              data: function(params){ return { searchTerm: params.term }; },
+              processResults: function(data){ return { results: data }; },
+              cache: true
+            },
+            minimumInputLength: 1
+          }).on('change', function(){ $('#empleado_error').hide(); });
+
+          // ==========================================================
+          //  🔸 BÚSQUEDA POR ESCÁNER (Enter dentro del input)
+          // ==========================================================
+          $('#buscarInventario').on('submit', function (e) {
+            e.preventDefault(); // evita redirección al JSON
+
+            const NumeroInventario = $('#NumeroInventario').val().trim();
+            const NumeroSerie = $('#NumeroSerie').val().trim();
+
+            if (!NumeroInventario && !NumeroSerie) {
+              Swal.fire({ type: 'info', title: 'Sin criterios', text: 'Capture número de inventario o número de serie.' });
+              return;
+            }
+
+            $.ajax({
+              type: 'POST',
+              url: '@Url.Action("BuscarInventario", "Inventario")',
+              data: { NumeroInventario, NumeroSerie },
+              success: function (data) {
+                if (!data || !data.length) {
+                  $noResults.show();
+                } else {
+                  $noResults.hide();
+                  const rows = [];
+                  data.forEach(function (activo) {
+                    if (!activosSet.has(activo.IdActivos)) {
+                      activosSet.add(activo.IdActivos);
+                      rows.push(`
+                        <tr data-id="${activo.IdActivos}">
+                          <td>${activo.IdActivos}</td>
+                          <td>${activo.NombreEmpleado || ''}</td>
+                          <td>${activo.NumeroInventario || ''}</td>
+                          <td>${activo.Descripcion || ''}</td>
+                          <td>${activo.NumeroSerie || ''}</td>
+                          <td>${activo.Categoria || ''}</td>
+                          <td>${activo.Marca || ''}</td>
+                          <td class="text-center">
+                            <button type="button" class="btn btn-sm btn-outline-danger btn-remove" title="Quitar">
+                              <i class="mdi mdi-delete"></i>
+                            </button>
+                          </td>
+                        </tr>`);
+                    }
+                  });
+                  if (rows.length) { $tablaBody.append(rows.join('')); updateBadge(); }
+                }
+
+                // limpia campos y enfoca nuevamente para siguiente escaneo
+                $('#NumeroInventario').val('').focus();
+                $('#NumeroSerie').val('');
+              },
+              error: function () {
+                Swal.fire({ type: 'error', title: 'Error', text: 'No se pudo buscar el activo.' });
+              }
+            });
+          });
+
+          // ======= Quitar fila =======
+          $tablaBody.on('click', '.btn-remove', function () {
+            const $tr = $(this).closest('tr');
+            const id = parseInt($tr.data('id'), 10);
+            activosSet.delete(id);
+            $tr.remove();
+            updateBadge();
+          });
+
+          // ======= Guardar inventario =======
+          $('#Guardar').on('click', function () {
+            const numEmp = $('#employee-search').val();
+            if (!numEmp) { $('#empleado_error').show(); $('#employee-search').focus(); return; }
+
+            const activos = Array.from(activosSet);
+            if (activos.length === 0) {
+              Swal.fire({ type: 'warning', title: 'Atención', text: 'No hay activos en la lista.' });
+              return;
+            }
+
+            $.ajax({
+              type: 'POST',
+              url: '@Url.Action("GuardarInventario2", "Inventario")',
+              data: { numEmp: numEmp, selectedActivos: JSON.stringify(activos) },
+              success: function (res) { handleResponseModel(res, numEmp, JSON.stringify(activos)); },
+              error: function () {
+                Swal.fire({ type: 'error', title: 'Error', text: 'No se pudo guardar el inventario.' });
+              }
+            });
+          });
+
+          // ======= Manejo de respuesta del back =======
+          function handleResponseModel(res, numEmp, selectedActivosJson) {
+            if (!res) { Swal.fire({ type: 'error', title: 'Error', text: 'Respuesta inválida del servidor.' }); return; }
+
+            // Si el back pide confirmación de folio
+            if (res.function && /^ConfirmarNuevoInventario/i.test(res.function))
+              return ConfirmarNuevoInventario(numEmp, selectedActivosJson);
+
+            if (res.response) {
+              Swal.fire({
+                type: 'success',
+                title: 'Éxito',
+                text: res.message || 'Inventario guardado con éxito.',
+                confirmButtonText: 'Ver PDF'
+              }).then(() => {
+                // 🔴 Si el back envió la instrucción con el folio, extraerlo y abrir ese PDF
+                if (res.function) {
+                  const m = res.function.match(/GenerarYAbrirPdf2\(['"](.+?)['"]\)/);
+                  if (m && m[1]) {
+                    GenerarYAbrirPdf2(m[1]);
+                  } else {
+                    // Fallback: PDF por empleado/año si no vino el folio
+                    GenerarYAbrirPdfByEmpleado(numEmp);
+                  }
+                } else {
+                  // Fallback: PDF por empleado/año
+                  GenerarYAbrirPdfByEmpleado(numEmp);
+                }
+
+                setTimeout(() => window.location.href = '@Url.Action("InventarioFisico", "Inventario")', 1500);
+              });
+            } else {
+              Swal.fire({ type: 'error', title: 'Error', text: res.message || 'No se pudo guardar.' });
+            }
+          }
+
+          // ======= Confirmación (folio nuevo o existente) =======
+          window.ConfirmarNuevoInventario = function (numEmp, selectedActivosJson) {
+            Swal.fire({
+              type: 'question',
+              title: 'Inventario existente',
+              html: `
+                <div class="text-left">
+                  <p class="mb-2">Ya existe un inventario para el año en curso.<br><b>¿Qué deseas hacer?</b></p>
+                  <label><input type="radio" name="optInv" value="nuevo" checked> Crear folio nuevo</label><br>
+                  <label><input type="radio" name="optInv" value="existente"> Actualizar existente</label>
+                </div>`,
+              showCancelButton: true,
+              confirmButtonText: 'Continuar',
+              cancelButtonText: 'Cancelar'
+            }).then(result => {
+              if (!result.value) return;
+              const choice = document.querySelector('input[name="optInv"]:checked').value;
+              const data = { numEmp, selectedActivos: selectedActivosJson };
+              if (choice === 'nuevo') data.crearNuevo = true; else data.usarExistente = true;
+
+              $.ajax({
+                type: 'POST',
+                url: '@Url.Action("GuardarInventario2", "Inventario")',
+                data: data,
+                success: function (res) { handleResponseModel(res, numEmp, selectedActivosJson); },
+                error: function () { Swal.fire({ type: 'error', title: 'Error', text: 'No se pudo guardar.' }); }
+              });
+            });
+          };
+
+          // ======= Generar y abrir PDF por FOLIO =======
+          function GenerarYAbrirPdf2(folio) {
+            $.ajax({
+              url: '@Url.Action("GenerarPdf2", "Inventario")',
+              type: 'POST',
+              data: { FolioInventario: folio },
+              success: function (pdfData) {
+                if (!pdfData || !pdfData.PdfBase64 || pdfData.PdfBase64 === "null") {
+                  Swal.fire({ type: 'error', title: 'PDF', text: 'No se recibió el PDF.' });
+                  return;
+                }
+                const byteCharacters = atob(pdfData.PdfBase64);
+                const byteNumbers = Array.from(byteCharacters, c => c.charCodeAt(0));
+                const blob = new Blob([new Uint8Array(byteNumbers)], { type: 'application/pdf' });
+                window.open(URL.createObjectURL(blob), '_blank');
+              },
+              error: function () { Swal.fire({ type: 'error', title: 'PDF', text: 'Error al generar/abrir el PDF.' }); }
+            });
+          }
+
+          // ======= Generar y abrir PDF por EMPLEADO/AÑO (fallback) =======
+          function GenerarYAbrirPdfByEmpleado(NumeroEmpleado) {
+            $.ajax({
+              url: '@Url.Action("GenerarPdf", "Inventario")',
+              type: 'POST',
+              data: { NumeroEmpleado: NumeroEmpleado },
+              success: function (pdfData) {
+                if (!pdfData || !pdfData.PdfBase64 || pdfData.PdfBase64 === "null") {
+                  Swal.fire({ type: 'error', title: 'PDF', text: 'No se recibió el PDF.' });
+                  return;
+                }
+                const byteCharacters = atob(pdfData.PdfBase64);
+                const byteNumbers = Array.from(byteCharacters, c => c.charCodeAt(0));
+                const blob = new Blob([new Uint8Array(byteNumbers)], { type: 'application/pdf' });
+                window.open(URL.createObjectURL(blob), '_blank');
+              },
+              error: function () { Swal.fire({ type: 'error', title: 'PDF', text: 'Error al generar/abrir el PDF.' }); }
+            });
+          }
+
+          // ======= Cancelar =======
+          $('#Cancelar').on('click', function () {
+            activosSet.clear();
+            $tablaBody.empty();
+            updateBadge();
+            $('#employee-search').val(null).trigger('change');
+            $('#NumeroInventario').val('').focus();
+            $('#NumeroSerie').val('');
+            $noResults.hide();
+            Swal.fire({ type: 'info', title: 'Acción cancelada', text: 'Todos los datos han sido limpiados.' });
+          });
+
+        });
+    </script>
+}

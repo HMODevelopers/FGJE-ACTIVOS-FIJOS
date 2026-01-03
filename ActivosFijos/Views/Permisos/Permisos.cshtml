@@ -1,0 +1,63 @@
+﻿@model List<ActivosFijos.Models.ViewModels.MenuViewModel>
+
+@{
+    ViewBag.Title = "Permisos";
+}
+
+@using (Html.BeginForm("ActualizarPermisos", "Permisos", FormMethod.Post, new { data_ajax = true, data_reset = true }))
+{
+    <div class="card">
+        <div class="card-body">
+            <div class="alert alert-primary">
+                <h5 class="m-0">Nota:</h5>
+                <p class="m-0">
+                    Seleccione las partes del menú para las cuales este rol tiene permisos o permisos especiales. Marque las casillas correspondientes para asignar o quitar estos permisos según sea necesario. Los menús y submenús se muestran ordenados según la configuración establecida.
+                </p>
+            </div>
+            <input type="hidden" name="IdRol" value="@ViewBag.IdRol" />
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Título Menú</th>
+                        <th>Título SubMenú</th>
+                        <th>Permiso Visualización</th>
+                        <th>Permiso Especial</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Count; i++)
+                    {
+                        <tr>
+                            <td rowspan="@((Model[i].SubMenus.Count > 0 ? Model[i].SubMenus.Count : 1) + 1)">
+                                <b>@Model[i].TituloMenu</b>@Html.HiddenFor(model => model[i].IdMenu)
+                            </td>
+                            <td></td>
+                            <td>@Html.CheckBoxFor(model => model[i].PermisoVisualizacion)</td>
+                            <td>@Html.CheckBoxFor(model => model[i].PermisoEspecial)</td>
+                        </tr>
+                        for (int j = 0; j < Model[i].SubMenus.Count; j++)
+                        {
+                            <tr>
+                                <td><b>@Model[i].SubMenus[j].TituloSubMenu</b></td>
+                                <td>
+                                    @Html.HiddenFor(model => model[i].SubMenus[j].IdSubMenu) @* Campo oculto para IdSubMenu *@
+                                    @Html.CheckBoxFor(model => model[i].SubMenus[j].PermisoVisualizacion)
+                                </td>
+                                <td>@Html.CheckBoxFor(model => model[i].SubMenus[j].PermisoEspecial)</td>
+                            </tr>
+                        }
+                        <!-- Agregar una fila vacía para separar los menús -->
+                        <tr style="background-color: transparent;">
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <button type="button" class="btn btn-info waves-effect"  onclick="window.location.href='@Url.Action("Index", "Permisos")';">Atras</button>
+            <button type="submit" class="btn btn-primary" data-ajax="true" data-reset="true">Guardar Cambios</button>
+        </div>
+    </div>
+}

@@ -1,0 +1,67 @@
+﻿@model ActivosFijos.Models.PLU_CONF_Usuario
+@{
+    ViewBag.Title = "Agregar Usuario";
+}
+
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="alert alert-primary">
+            <h6 class="m-0">Simbología:</h6>
+            <p class="m-0">
+                * Campos obligatorios
+            </p>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                @using (Html.BeginForm("Guardar", "Usuarios", new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "divMenu" }))
+                {
+                    <div class="modal-body p-4">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="field-1" class="control-label">Nombre Usuario<span class="text-danger">*</span></label>
+                                    @Html.EditorFor(x => x.Username, new { htmlAttributes = new { @class = "form-control", placeholder = "", } })
+                                    @Html.ValidationMessageFor(x => x.Username, null, new { @class = "badge badge-danger" })
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="field-1" class="control-label">Password<span class="text-danger">*</span></label>
+                                    @Html.EditorFor(x => x.Pass, new { htmlAttributes = new { @class = "form-control", placeholder = "" } })
+                                    @Html.ValidationMessageFor(x => x.Pass, null, new { @class = "badge badge-danger" })
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="field-1" class="control-label">Nombres<span class="text-danger">*</span></label>
+                                    @Html.EditorFor(x => x.Nombres, new { htmlAttributes = new { @class = "form-control", placeholder = "" } })
+                                    @Html.ValidationMessageFor(x => x.Nombres, null, new { @class = "badge badge-danger" })
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="field-1" class="control-label">Apellidos<span class="text-danger">*</span></label>
+                                    @Html.EditorFor(x => x.Apellidos, new { htmlAttributes = new { @class = "form-control", placeholder = "" } })
+                                    @Html.ValidationMessageFor(x => x.Apellidos, null, new { @class = "badge badge-danger" })
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="IdMarca" class="control-label">Rol<span class="text-danger">*</span></label>
+                                    @Html.DropDownList("IdRol", ViewBag.Roles as SelectList, "-- Seleccione un Rol --", new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(x => x.IdRol, null, new { @class = "badge badge-danger" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-info waves-effect" id="cerrar" onclick="window.location.href='@Url.Action("Index", "Usuarios")';">Atras</button>
+                        <button data-ajax="true" data-reset="true" type="submit" class="btn btn-success waves-effect waves-light" id="guardar">Guardar</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div> <!-- end card-->
+</div><!-- end col -->

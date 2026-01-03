@@ -1,0 +1,47 @@
+﻿@model List<ActivosFijos.Models.PLU_OP_Activos>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>NumeroInventario</th>
+                <th>Descripcion</th>
+                <th>NumeroSerie</th>
+                <th>IdCategoria</th>
+                <th>IdMarca</th>
+                <th>IdProveedor</th>
+                <th>IdFactura</th>
+                <th>IdConcepto</th>
+                <th>IdClasificadores</th>
+                <th>IdRecurso</th>
+                <th>IdEstadoFisico</th>
+                <th>IdEstatusActivo</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Count; i++)
+            {
+                <tr>
+                    <td>@Model[i].NumeroInventario</td>
+                    <td>@Model[i].Descripcion</td>
+                    <td>@Model[i].NumeroSerie</td>
+                    <td>@Model[i].IdCategoria</td>
+                    <td>@Model[i].IdMarca</td>
+                    <td>@Model[i].IdProveedor</td>
+                    <td>@Model[i].IdFactura</td>
+                    <td>@Model[i].IdConcepto</td>
+                    <td>@Model[i].IdClasificadores</td>
+                    <td>@Model[i].IdRecurso</td>
+                    <td>@Model[i].IdEstadoFisico</td>
+                    <td>@Model[i].IdEstatusActivo</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <hr />
+    <button  class="btn btn-primary" id="guardarActivos">Guardar</button>
+    <br />
+    <br />
+</div>
+
+

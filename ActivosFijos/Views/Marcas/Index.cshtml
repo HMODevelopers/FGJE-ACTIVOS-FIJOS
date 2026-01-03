@@ -1,0 +1,31 @@
+﻿@model PagedList.IPagedList<ActivosFijos.Models.PLU_CAT_MarcaActivo>
+@{
+    ViewBag.Title = "Catalogo Marcas";
+}
+
+
+
+
+@Html.Partial("_Filtros")
+
+<div class="card">
+    <div class="card-body">
+        <h4 class="header-title">Listado Marcas</h4>
+        <p class="text-muted font-13 mb-4"></p>
+        <div id="resultadosBusqueda">
+            <!-- Aquí se mostrarán los resultados de la búsqueda -->
+            @Html.Partial("_ListaMarcas", Model) <!-- Agregar esto para mostrar los resultados iniciales -->
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ajax-unobtrusive/3.2.6/jquery.unobtrusive-ajax.min.js"></script>
+    <script src="~/Content/assets/js/pages/Filtros.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+        });
+    </script>
+    }

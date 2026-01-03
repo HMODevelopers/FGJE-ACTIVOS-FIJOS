@@ -1,0 +1,21 @@
+﻿@model PagedList.IPagedList<ActivosFijos.Models.PLU_CAT_Roles>
+@using PagedList.Mvc;
+
+@{
+    ViewBag.Title = "Roles";
+}
+
+
+<div class="card">
+    <div class="card-body">
+        <div id="resultadosBusqueda">
+            <!-- Aquí se mostrarán los resultados de la búsqueda -->
+            @Html.Partial("_ListaRoles", Model) <!-- Agregar esto para mostrar los resultados iniciales -->
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ajax-unobtrusive/3.2.6/jquery.unobtrusive-ajax.min.js"></script>
+    <script src="~/Content/assets/js/pages/Filtros.js"></script>
+}

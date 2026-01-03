@@ -1,0 +1,389 @@
+﻿@model PagedList.IPagedList<ActivosFijos.Models.PLU_OP_Activos>
+@using PagedList.Mvc;
+
+@{
+    ViewBag.Title = "Cambio Resguardo";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div id="buscadorEmpleado">
+                    <!-- Aquí se mostrarán los resultados de la búsqueda -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="alert alert-primary">
+                                <h5 class=""><strong>Instrucciones para Cambiar Activos</strong></h5>
+                                <p class="m-0">1.- Utiliza el campo de búsqueda para encontrar y seleccionar el empleado correcto.</p>
+                                <p class="m-0">2.- Escribe el nombre del empleado y selecciona la opción adecuada de la lista desplegable.</p><br />
+                                <p class="m-0"><b>Nota:</b> Los campos Folio y Oficio son obligatorios para todos los registros. Sin embargo, en caso de que el campo de Inventario Físico se active, los campos Folio y Oficio podrán ser omitidos. Es responsabilidad exclusiva de la persona que realice este movimiento, ya que no se tendrá sustento del movimiento realizado.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    @using (Html.BeginForm("Editar", "Resguardos", FormMethod.Post, new { enctype = "multipart/form-data", name = "AltaResguardos" }))
+                    {
+                        <div class="form-row">
+                            <div class="form-group col-lg-12">
+                                <label for="employee-search">Buscar empleado:</label>
+                                <select id="employee-search" name="NumeroEmpleado" class="form-control select2"></select>
+                                <span id="empleado_error" style="display: none;" class="badge badge-danger">Seleccione un empleado.</span>
+                            </div>
+
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-3">
+                                <label>Folio Oficio:</label>
+                                <input type="text" name="FolioOficio" id="FolioOficio" class="form-control" />
+                                <span id="folio-error" style="display: none;" class="badge badge-danger">El campo folio Oficio es obligatorio.</span>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label>Oficio:</label>
+                                <input type="file" name="file" id="files-alta" class="form-control" accept=".pdf,.doc,.docx" />
+                                <span id="file-error" style="display: none;" class="badge badge-danger">Debe cargar un archivo.</span>
+                                <span id="file-error2" style="display: none;" class="badge badge-danger">Solo se permiten archivos PDF y Word (.doc, .docx).</span>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label>Fecha Cambio:</label>
+                                <input type="date" name="FechaCreacion" id="FechaCreacion" value="" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-3">
+                                <div class="checkbox checkbox-success">
+                                    <input type="checkbox" name="if" id="if" value="if">
+                                    <label for="if"> Inventario Fisico </label>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="selectedActivos" name="selectedActivos" />
+                        <button data-ajax="true" data-reset="true" type="submit" id="guardar" class="btn btn-success waves-effect waves-light">Guardar</button>
+                    }
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                @Html.Partial("_FiltrosCambiar")
+                <div id="vista-previa">
+                    @Html.Partial("_ListaActivosCambiar", Model) <!-- Agregar esto para mostrar los resultados iniciales -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="alert alert-warning">
+                            <h5 class=""><strong><i class="mdi mdi-alert-outline mr-2"></i>Tabla para cambiar los activos de un empleado a otro empleado.</strong></h5>
+                            <p class="m-0">En esta tabla, podrás agregar activos que serán asignados al empleado seleccionado en la parte superior de la página. Los activos que ingreses aquí estarán vinculados directamente al empleado seleccionado, permitiéndote administrar de manera eficiente los recursos asignados a cada empleado.</p>
+                        </div>
+
+                        <table class="table table-bordered" id="destinationTable">
+                            <thead>
+                                <tr>
+                                    <th>Numero Inventario</th>
+                                    <th>Descripcion</th>
+                                    <th>Numero de Serie</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+</div>
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ajax-unobtrusive/3.2.6/jquery.unobtrusive-ajax.min.js"></script>
+    <script src="~/Content/assets/js/pages/Filtros.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            function obtenerFechaActual() {
+                const hoy = new Date();
+                let mes = hoy.getMonth() + 1;
+                let dia = hoy.getDate();
+
+                // Ajuste para asegurar que el formato sea siempre YYYY-MM-DD
+                if (mes < 10) {
+                    mes = '0' + mes;
+                }
+                if (dia < 10) {
+                    dia = '0' + dia;
+                }
+
+                return hoy.getFullYear() + '-' + mes + '-' + dia;
+            }
+
+            // Establecer la fecha actual en el campo FechaCreacion
+            document.getElementById('FechaCreacion').value = obtenerFechaActual();
+
+                var activosSeleccionados = [];
+
+                 $('#employee-search').select2({
+                        placeholder: "Seleccione un empleado",
+                        allowClear: true,
+                        ajax: {
+                            url: '@Url.Action("GetEmpleados", "Resguardos")',
+                            dataType: 'json',
+                            delay: 150,
+                            data: function (params) {
+                                return {
+                                    searchTerm: params.term // Término de búsqueda
+
+                                };
+
+
+                            },
+                            processResults: function (data) {
+                                return {
+                                    results: data
+                                };
+                                console.log("Numero 1");
+                            },
+                            cache: true
+                        },
+                        minimumInputLength: 1 // Inicia la búsqueda después de escribir al menos un carácter
+                 });
+
+                $('#if').change(function () {
+                    if ($(this).is(':checked')) {
+                        $('#FolioOficio').prop('disabled', true).removeAttr('required');
+                        $('#file-altas').prop('disabled', true).removeAttr('required');
+                        $('#folio-error').css('display', 'none');
+                        $('#file-error').css('display', 'none');
+                        $('#file-error2').css('display', 'none');
+
+                    } else {
+                        $('#FolioOficio').prop('disabled', false).attr('required', 'required');
+                        $('#file-altas').prop('disabled', false).attr('required', 'required');
+                        $('#folio-error').css('display', 'inline');
+                        $('#file-error').css('display', 'inline');
+                        $('#file-error2').css('display', 'inline');
+
+                    }
+                });
+
+
+                $('#guardar').click(function (e) {
+                    // Validar el formulario
+                    var isValid = validarFormulario();
+
+
+                    // Validar si se han seleccionado activos
+                    var activosSeleccionados = $('#selectedActivos').val().trim();
+
+                    if (activosSeleccionados === '') {
+                        Swal.fire({
+                            type: 'error',
+                            title: 'Oops...',
+                            text: 'Debe seleccionar al menos un activo.'
+                        });
+                        e.preventDefault(); // Evitar el envío del formulario si no hay activos seleccionados
+                        return false;
+                    }
+
+                    // Si el formulario no es válido, evitamos el envío
+                    if (!isValid) {
+                        e.preventDefault();
+                        return false;
+                    }
+                });
+
+                function validarFormulario() {
+                    var isValid = true;
+
+                    var employeeSearchElement = document.getElementById('employee-search');
+                    var folioOficioElement = document.getElementById('FolioOficio');
+                    var fileUploadElement = document.getElementById('files-alta');
+                    var noFolioFileElement = document.getElementById('if');
+
+                    var employeeSearch = employeeSearchElement ? employeeSearchElement.value.trim() : '';
+                    var folioOficio = folioOficioElement ? folioOficioElement.value.trim() : '';
+                    var fileUpload = fileUploadElement ? fileUploadElement.value : '';
+                    var noFolioFile = noFolioFileElement ? noFolioFileElement.checked : false;
+
+                    var fileError = $('#file-error');
+                    var fileError2 = $('#file-error2');
+                    var empleadoError = $('#empleado_error');
+                    var folioError = $('#folio-error');
+
+
+
+
+                    // Validación de campos
+                    if (!employeeSearch) {
+                        isValid = false;
+                        empleadoError.css('display', 'inline');
+                        //alert('Debe seleccionar un empleado.');
+                    } else {
+                        empleadoError.css('display', 'none');
+                    }
+
+                    if (!noFolioFile) {
+
+                        if (folioOficio.length === 0) {
+                            isValid = false;
+                            folioError.css('display', 'inline');
+                            //alert('Debe ingresar un folio de oficio.');
+                        } else {
+                            folioError.css('display', 'none');
+                        }
+
+                        var archivos = fileUploadElement ? fileUploadElement.files : [];
+                        if (archivos.length === 0) {
+                            isValid = false;
+                            fileError.css('display', 'inline');
+                           // alert('Debe cargar un archivo.');
+                        } else {
+                            // Validar extensiones de archivos
+                            var extensionesPermitidas = ['pdf', 'doc', 'docx'];
+                            var tieneExtensionInvalida = false;
+
+                            for (var i = 0; i < archivos.length; i++) {
+                                var archivo = archivos[i];
+                                var extension = archivo.name.split('.').pop().toLowerCase();
+                                if (extensionesPermitidas.indexOf(extension) === -1) {
+                                    tieneExtensionInvalida = true;
+                                    break;
+                                }
+                            }
+
+                            if (tieneExtensionInvalida) {
+                                isValid = false;
+                                fileError2.css('display', 'inline');
+                                //alert('Solo se permiten archivos PDF y Word (.doc, .docx).');
+                                $('#files-baja').val(''); // Limpiar el campo de archivo
+                            } else {
+
+                                fileError2.css('display', 'none');
+                            }
+
+                            fileError.css('display', 'none');
+                        }
+
+                    }
+
+                    return isValid;
+                }
+
+                $('#employee-search').change(function () {
+                    validarFormulario();
+                });
+
+                $('#FolioOficio').change(function () {
+                    validarFormulario();
+                });
+
+                $('#files-alta').change(function () {
+                    validarFormulario();
+                });
+
+
+
+
+                $(document).on('click', '.activo-checkbox', function () {
+
+                    var activoId = $(this).val(); // Obtener el ID del activo seleccionado
+                    var $row = $(this).closest('tr'); // Obtener la fila del checkbox
+                    var activoNumeroInventario = $row.find('.activo-numeroinventario').text(); // Obtener el nombre del activo
+                    var activoDescripcion = $row.find('.activo-descripcion').text(); // Obtener la descripción del activo
+                    var activoNumeroSerie = $row.find('.activo-numeroserie').text();
+
+                    // Si el checkbox está marcado, agregar el ID del activo al array
+                    if ($(this).is(':checked')) {
+
+                        activosSeleccionados.push(activoId);
+                        $('#destinationTable').append('<tr data-activo-id="' + activoId + '"><td>' + activoNumeroInventario + '</td><td>' + activoDescripcion + '</td><td>' + activoNumeroSerie + '</td></tr>');
+
+                    } else {
+
+                        // Si el checkbox está desmarcado, eliminar el ID del activo del array
+                        var index = activosSeleccionados.indexOf(activoId);
+
+                        if (index !== -1) {
+
+                            activosSeleccionados.splice(index, 1);
+                        }
+                        // Eliminar la fila correspondiente de la tabla destino
+                        $('#destinationTable tr[data-activo-id="' + activoId + '"]').remove();
+                    }
+
+
+                    $("#selectedActivos").val(JSON.stringify(activosSeleccionados));
+
+                });
+
+
+
+            // Función para restaurar los checkboxes seleccionados al cargar una nueva página de activos
+                 function restaurarSeleccion() {
+                    // Iterar sobre los checkboxes y marcar los activos seleccionados
+                     $('.activo-checkbox').each(function () {
+                        var activoId = $(this).val();
+                        if (activosSeleccionados.includes(activoId)) {
+                            $(this).prop('checked', true);
+                        } else {
+                            $(this).prop('checked', false);
+                        }
+                    });
+
+                    $("#selectedActivos").val(JSON.stringify(activosSeleccionados));
+
+                 }
+
+            // Llamar a la función de restaurarSeleccion cuando se cargue la vista previa de activos
+            $('#vista-previa').on('DOMSubtreeModified', function () {
+                restaurarSeleccion();
+            });
+
+
+});
+
+        function GenerarYAbrirPdf(activos, NumeroEmpleado, TipoMovimiento, FechaCreacion) {
+
+            var activosJson = JSON.stringify(activos);
+              
+                // Realizar una solicitud al controlador para generar el PDF
+                $.ajax({
+                    url: '@Url.Action("GenerarPdf", "Resguardos")', // Reemplazar con la ruta correcta
+                    type: "POST",
+                    data: { activos: activosJson, NumeroEmpleado: NumeroEmpleado, TipoMovimiento: TipoMovimiento, FechaCreacion: FechaCreacion },
+                    success: function (pdfData) {
+                        // Crear un objeto Blob con el PDF en formato Base64
+                        var byteCharacters = atob(pdfData.PdfBase64);
+                        var byteNumbers = new Array(byteCharacters.length);
+                        for (var i = 0; i < byteCharacters.length; i++) {
+                            byteNumbers[i] = byteCharacters.charCodeAt(i);
+                        }
+                        var byteArray = new Uint8Array(byteNumbers);
+                        var blob = new Blob([byteArray], { type: 'application/pdf' });
+
+                        // Crear un objeto URL a partir del Blob
+                        var url = URL.createObjectURL(blob);
+
+                        // Abrir una nueva pestaña con el PDF
+                        window.open(url, '_blank');
+                    },
+                    error: function (error) {
+                        console.error("Error al generar o abrir el PDF." + error);
+                    }
+                });
+            }
+    </script>
+}

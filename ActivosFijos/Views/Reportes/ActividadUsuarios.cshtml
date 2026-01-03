@@ -1,0 +1,75 @@
+﻿@model IEnumerable<ActivosFijos.Models.ViewModels.ActividadUsuariosViewModel>
+@{
+    ViewBag.Title = "Actividad por Usuario";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string desde = ViewBag.Desde as string ?? DateTime.Today.AddDays(-6).ToString("yyyy-MM-dd");
+    string hasta = ViewBag.Hasta as string ?? DateTime.Today.ToString("yyyy-MM-dd");
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card-box">
+            <h4 class="header-title">Actividad por Usuario</h4>
+            <p class="sub-header">Rango: @desde a @hasta</p>
+
+            <form method="get" action="@Url.Action("ActividadUsuarios","Reportes")" class="form-inline mb-3">
+                <div class="form-group mr-2">
+                    <label class="mr-1">De</label>
+                    <input type="date" name="de" value="@desde" class="form-control" required />
+                </div>
+                <div class="form-group mr-2">
+                    <label class="mr-1">A</label>
+                    <input type="date" name="a" value="@hasta" class="form-control" required />
+                </div>
+                <button type="submit" class="btn btn-primary">Filtrar</button>
+
+                <a class="btn btn-success ml-2"
+                   href="@Url.Action("DescargarExcelActividadUsuarios","Reportes", new { de = desde, a = hasta })">
+                    <i class="mdi mdi-file-excel"></i> Descargar Excel
+                </a>
+            </form>
+
+            <div class="table-responsive">
+                <table class="table table-sm table-striped table-bordered">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>NOMBRE COMPLETO</th>
+                            <th class="text-center">ALTAS<br /># ACTIVOS</th>
+                            <th class="text-center">ALTAS<br /># FOLIOS</th>
+                            <th class="text-center">CAMBIOS<br /># ACTIVOS</th>
+                            <th class="text-center">CAMBIOS<br /># FOLIOS</th>
+                            <th class="text-center">INVENTARIOS<br /># ACTIVOS</th>
+                            <th class="text-center">INVENTARIOS<br /># FOLIOS</th>
+                            <th class="text-center">BAJAS<br /># ACTIVOS</th>
+                            <th class="text-center">BAJAS<br /># FOLIOS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var r in Model)
+                            {
+                                <tr>
+                                    <td>@r.NombreCompleto</td>
+                                    <td class="text-center">@r.ALTAS_NUMERO_ACTIVOS</td>
+                                    <td class="text-center">@r.ALTAS_FOLIOS_ATENDIDOS</td>
+                                    <td class="text-center">@r.CAMBIOS_NUMERO_ACTIVOS</td>
+                                    <td class="text-center">@r.CAMBIOS_FOLIOS_ATENDIDOS</td>
+                                    <td class="text-center">@r.INVENTARIOS_NUMERO_ACTIVOS</td>
+                                    <td class="text-center">@r.INVENTARIOS_FOLIOS_ATENDIDOS</td>
+                                    <td class="text-center">@r.BAJAS_NUMERO_ACTIVOS</td>
+                                    <td class="text-center">@r.BAJAS_FOLIOS_ATENDIDOS</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="10" class="text-center">Sin resultados para el rango seleccionado.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>

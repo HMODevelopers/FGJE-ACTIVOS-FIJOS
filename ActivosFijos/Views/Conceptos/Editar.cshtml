@@ -1,0 +1,54 @@
+﻿@model ActivosFijos.Models.PLU_CAT_Conceptos
+
+@{
+    ViewBag.Title = "Editar";
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="alert alert-primary">
+            <h6 class="m-0">Simbología:</h6>
+            <p class="m-0">
+                * Campos obligatorios
+            </p>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                @using (Html.BeginForm("Guardar", "Conceptos", new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "divMenu" }))
+                {
+                    <div class="modal-body p-4">
+                        <div class="row">
+                            @Html.HiddenFor(x => x.IdConceptos)
+                            @Html.HiddenFor(x => x.IdConcepto)
+                            @Html.HiddenFor(x => x.FechaCreacion)
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="field-1" class="control-label">Nombre Concepto<span class="text-danger">*</span></label>
+                                    @Html.EditorFor(x => x.NombreConcepto, new { htmlAttributes = new { @class = "form-control", placeholder = "", } })
+                                    @Html.ValidationMessageFor(x => x.NombreConcepto, null, new { @class = "badge badge-danger" })
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="field-1" class="control-label">Capitulo<span class="text-danger">*</span></label>
+                                    @Html.EditorFor(x => x.IdCapitulo, new { htmlAttributes = new { @class = "form-control", placeholder = "", } })
+                                    @Html.ValidationMessageFor(x => x.IdCapitulo, null, new { @class = "badge badge-danger" })
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    @Html.CheckBoxFor(x => x.Activo)<br /><label for="Activo" class="control-label">Activo<span class="text-danger"></span></label>
+                                    @Html.ValidationMessageFor(x => x.Activo, null, new { @class = "badge badge-danger" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-info waves-effect" id="cerrar" onclick="window.location.href='@Url.Action("Index", "Conceptos")';">Atras</button>
+                        <button data-ajax="true" data-reset="true" type="submit" class="btn btn-success waves-effect waves-light" id="guardar">Guardar</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div> <!-- end card-->
+</div><!-- end col -->

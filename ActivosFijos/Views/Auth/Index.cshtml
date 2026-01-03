@@ -1,0 +1,108 @@
+﻿﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>INVENTARIO FGJE</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- App favicon -->
+    <link rel="shortcut icon" href="~/Content/assets/images/favicon.ico">
+
+    <!-- App css -->
+    <link href="~/Content/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/Content/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/Content/assets/css/app.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/Content/Loader.css" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body class="authentication-bg authentication-bg-pattern">
+
+    <div class="wrapper-loader fade" id="LoadingImage" style="display: none;">
+        <div class="loader">
+            <div class="loader__figure"></div>
+            <p class="loader__label">Cargando...</p>
+        </div>
+    </div>
+
+    <div class="account-pages mt-5 mb-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6 col-xl-5">
+                    <div class="card">
+
+                        <div class="card-body p-4">
+
+                            <div class="text-center w-80 m-auto">
+                                <a href="">
+                                    <span><img src="~/Content/assets/images/logo-lg-fgje.png" alt="" height="120"></span>
+                                </a>
+                                <p class="text-muted mb-4 mt-3">Ingrese su usuario y contraseña para acceder al panel de administración.</p>
+                            </div>
+
+                            <h5 class="auth-title">Iniciar Sesión</h5>
+
+                            @using (Html.BeginForm("Login", "Auth", FormMethod.Post))
+                            {
+
+                                <div class="form-group mb-3">
+                                    <label for="emailaddress">Usuario</label>
+                                    <input class="form-control" name="username" type="text" id="emailaddress" required="" placeholder="">
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label for="password">Contraseña</label>
+                                    <input class="form-control" name="password_text" type="password" required="" id="password" placeholder="">
+                                </div>
+
+
+                                <div class="form-group mb-0 text-center">
+                                    <button data-ajax="true" class="btn btn-danger btn-block" type="submit"> Iniciar Sesión </button>
+                                </div>
+                            }
+
+                            <div class="text-center">
+
+                            </div>
+
+                        </div> <!-- end card-body -->
+                    </div>
+                    <!-- end card -->
+
+                    <div class="row mt-3">
+                        <div class="col-12 text-center">
+
+                        </div> <!-- end col -->
+                    </div>
+                    <!-- end row -->
+
+                </div> <!-- end col -->
+            </div>
+            <!-- end row -->
+        </div>
+        <!-- end container -->
+    </div>
+    <!-- end page -->
+
+
+    <footer class="footer footer-alt">
+        @DateTime.Now.Year &copy; <a href="">FGJE</a>
+    </footer>
+
+    
+    <script src="~/Content/assets/js/jquery.js"></script>
+    <script src="~/Content/assets/js/jquery.validate.min.js"></script>
+    <script src="~/Content/assets/js/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/Content/assets/js/jquery.form.js"></script>
+    <script src="~/Content/assets/js/Loader.js"></script>
+    <script src="~/Content/assets/js/ini_2.js"></script>
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,41 @@
+﻿@model PagedList.IPagedList<ActivosFijos.Models.ViewModels.DetalleBajasActivosViewModel>
+
+@{
+    ViewBag.Title = "Lista Bajas";
+}
+
+@Html.Partial("_FiltrosBajas")
+
+<div class="card">
+    <div class="card-body">
+
+        <div class="d-flex justify-content-between mb-2">
+            <h5 class="mb-0">Resultados</h5>
+            <a class="btn btn-success"
+               href="@Url.Action("ExportarBajasExcel", new {
+                   FolioBaja = ViewBag.FolioBaja,
+                   NumeroLote = ViewBag.NumeroLote,
+                   NumeroInventario = ViewBag.NumeroInventario,
+                   FechaDesde = ViewBag.FechaDesde != null ? ((DateTime)ViewBag.FechaDesde).ToString("yyyy-MM-dd") : null,
+                   FechaHasta = ViewBag.FechaHasta != null ? ((DateTime)ViewBag.FechaHasta).ToString("yyyy-MM-dd") : null
+               })">
+                <i class="mdi mdi-file-excel"></i> Exportar a Excel
+            </a>
+        </div>
+
+        <div id="resultadosBusqueda">
+            @Html.Partial("_ListaBajasDefinitivas", Model)
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ajax-unobtrusive/3.2.6/jquery.unobtrusive-ajax.min.js"></script>
+    <script src="~/Content/assets/js/pages/Filtros.js"></script>
+    <script>
+
+
+    </script>
+}
+
+

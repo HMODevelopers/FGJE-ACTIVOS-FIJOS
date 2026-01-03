@@ -1,0 +1,36 @@
+﻿@{
+    var menuHelper = new Helpers.MenuHelper();
+    var idUsuario = Helpers.SessionHelper.GetUser(); // Obtener el ID del usuario logeado
+    var idRol = Helpers.SessionHelper.GetRol(idUsuario); // Obtener el ID del rol del usuario logeado
+}
+
+<div class="left-side-menu">
+    <div class="slimscroll-menu">
+        <!--- Sidemenu -->
+        <div id="sidebar-menu">
+            <ul class="metismenu" id="side-menu">
+                <li class="menu-title" style="color: white;">Navegación</li>
+
+                @foreach (var item in menuHelper.GetMenu(idRol))
+                {
+                    <li>
+                        <a href="javascript: void(0);">
+                            <i class="@item.Icono"></i>
+                            <span>@item.TituloMenu</span>
+                            <span class="menu-arrow"></span>
+                        </a>
+                        <ul class="nav-second-level" aria-expanded="false">
+                            @foreach (var subItem in item.SubMenus)
+                            {
+                                <li><a href="/@subItem.Controlador/@subItem.Accion">@subItem.TituloSubMenu</a></li>
+                            }
+                        </ul>
+                    </li>
+                }
+            </ul>
+        </div>
+        <!-- End Sidebar -->
+        <div class="clearfix"></div>
+    </div>
+    <!-- Sidebar -left -->
+</div>

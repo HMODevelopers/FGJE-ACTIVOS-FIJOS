@@ -1,0 +1,41 @@
+﻿<div class="card-header" style="border-color:darkgray; border-style:dotted;">
+    <h5>Filtros</h5>
+
+    <div class="row">
+        <div class="col-lg-12">
+            @using (Ajax.BeginForm("ListarCambios", "Resguardos", new AjaxOptions { HttpMethod = "GET", UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" }))
+            {
+                <input type="hidden" name="numemp" id="numempfiltros" value="@ViewBag.NumEmp" />
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="field-1" class="control-label">Nombre Completo Resguardante</label>
+                            <div class="input-group">
+                                @Html.TextBox("NombreResguardante", null, new { @class = "form-control filtrar" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="field-1" class="control-label">Fecha Alta</label>
+                            <div class="input-group">
+                                @Html.TextBox("FechaAlta", null, new { @class = "form-control filtrar", @type = "Date" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

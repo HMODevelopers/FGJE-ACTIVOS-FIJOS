@@ -1,0 +1,198 @@
+﻿@model ActivosFijos.Models.ViewModels.DetalleBajaViewModel
+@{
+    ViewBag.Title = "Baja Activo";
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="alert alert-primary">
+            <p class="m-0"><strong>NOTA:</strong></p>
+            <p class="m-0">1.- Es imprescindible incluir el número de folio junto con su respectivo oficio.</p>
+            <p class="m-0">2.- Se permite la carga únicamente de archivos en formato PDF , DOC & DOCX</p>
+        </div>
+        <div class="card">
+            <div class="card-body">
+
+
+                @if (Model != null)
+                {
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <strong class="text-primary">Número de Inventario:</strong>
+                                    <p>@(Model.DetalleActivo.NumeroInventario != null ? Model.DetalleActivo.NumeroInventario.ToString() : "")</p>
+                                </div>
+                                <div class="col-md-3">
+                                    <strong class="text-primary">Descripción:</strong>
+                                    <p>@(Model.DetalleActivo.Descripcion != null ? Model.DetalleActivo.Descripcion : "")</p>
+                                </div>
+                                <div class="col-md-3">
+                                    <strong class="text-primary">Numero de Serie:</strong>
+                                    <p> @(Model.DetalleActivo.NumeroSerie != null ? Model.DetalleActivo.NumeroSerie : "")</p>
+                                </div>
+                                <div class="col-md-3">
+                                    <strong class="text-primary">Categoria:</strong>
+                                    <p>@(Model.DetalleActivo.Categoria != null ? Model.DetalleActivo.Categoria : "SIN CATEGORIA")</p>
+                                </div>
+                            </div>
+                            <hr />
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <strong class="text-primary">Marca:</strong>
+                                    <p>@(Model.DetalleActivo.Marca != null ? Model.DetalleActivo.Marca : "SIN MARCA")</p>
+                                </div>
+                                <div class="col-md-3">
+                                    <strong class="text-primary">Concepto:</strong>
+                                    <p>@(Model.DetalleActivo.Concepto != null ? Model.DetalleActivo.Concepto : "SIN CONCEPTO")</p>
+                                </div>
+                                <div class="col-md-3">
+                                    <strong class="text-primary">Clasificador:</strong>
+                                    <p>@(Model.DetalleActivo.Clasificador != null ? Model.DetalleActivo.Clasificador : "SIN CLASIFICADOR")</p>
+                                </div>
+                                <div class="col-md-3">
+                                    <strong class="text-primary">Almacén:</strong>
+                                    <p>@(Model.DetalleActivo.Almacen != null ? Model.DetalleActivo.Almacen : "")</p>
+                                </div>
+                            </div>
+                            <hr />
+                            <div class="row">
+
+                                <div class="col-md-3">
+                                    <strong class="text-primary">Estado Físico:</strong>
+                                    <p>@(Model.DetalleActivo.EstadoFisico != null ? Model.DetalleActivo.EstadoFisico : "SIN ESTATUS FISICO")</p>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <strong class="text-primary">Estatus Activo:</strong>
+                                    <p>@(Model.DetalleActivo.EstadoActivo != null ? Model.DetalleActivo.EstadoActivo : "")</p>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+
+                }
+                else
+                {
+                    <p>Activo No existe</p>
+                }
+                <br />
+                <hr />
+                @using (Html.BeginForm("Baja", "Activos", FormMethod.Post, new { id = "bajaForm",name = "bajaForm", @class = "ajax-form" }))
+                {
+                    
+                        <div class="row">
+                            <div class="col-md-12">
+
+
+                                @Html.HiddenFor(x => x.PLU_OP_BajasActivos.IdBaja)
+                                @Html.HiddenFor(x => x.PLU_OP_BajasActivos.IdActivos, new { id = "BajasActivos_IdActivos", Value = Model.DetalleActivo.IdActivos })
+                                @Html.HiddenFor(x => x.PLU_OP_BajasActivos.PLU_OP_OficiosBajas.RutaOficio, new {Value = "NombreProvional"})
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="control-label">Folio Oficio</label>
+                                            @Html.TextBoxFor(x => x.PLU_OP_BajasActivos.PLU_OP_OficiosBajas.FolioOficio, new { placeholder = "", name = "FolioOficio", @class = "form-control" })
+                                            @Html.ValidationMessageFor(x => x.PLU_OP_BajasActivos.PLU_OP_OficiosBajas.FolioOficio, null, new { @class = "badge badge-danger" })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="IdRecurso" class="control-label">Oficio Doc</label>
+                                            <input type="file" name="files" id="files-baja" class="form-control" required accept=".pdf,.doc,.docx" />
+                                            <span id="file-error" style="display: none;" class="badge badge-danger">Solo se permiten archivos PDF y Word (.doc, .docx).</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-info waves-effect" id="cerrar" onclick="window.location.href='@Url.Action("Index", "Activos")';">Atras</button>
+                            <button data-ajax="true" data-reset="true" type="submit" class="btn btn-success waves-effect waves-light">Guardar</button>
+                        </div>
+                    }
+                </div>
+        </div>
+    </div> <!-- end card-->
+</div><!-- end col -->
+
+
+@section Scripts {
+
+    <script>
+        
+        $(document).ready(function () {
+
+            function validarFormulario() {
+                var archivos = $('#files-baja')[0].files; // Obtener los archivos seleccionados
+                var fileError = $('#file-error');
+                var extensionesPermitidas = ['pdf', 'doc', 'docx']; // Extensiones permitidas
+
+                // Variable para verificar si algún archivo tiene una extensión no permitida
+                var tieneExtensionInvalida = false;
+
+                // Variable para verificar si al menos se ha seleccionado un archivo
+                var seSeleccionoArchivo = false;
+
+                // Recorrer los archivos seleccionados
+                for (var i = 0; i < archivos.length; i++) {
+                    var archivo = archivos[i];
+                    var extension = archivo.name.split('.').pop().toLowerCase(); // Obtener la extensión del archivo
+
+                    // Verificar si la extensión del archivo está permitida
+                    if ($.inArray(extension, extensionesPermitidas) === -1) {
+                        // Si la extensión no está permitida, mostrar mensaje de error
+                        fileError.text('Uno o más archivos tienen extensiones no permitidas.');
+                        fileError.css('display', 'inline');
+                        tieneExtensionInvalida = true;
+                        $('#files-baja').val(''); // Limpiar el campo de archivo
+                        break; // Detener la iteración
+                    }
+
+                    // Marcar que al menos se seleccionó un archivo
+                    seSeleccionoArchivo = true;
+                }
+
+                // Verificar si no se seleccionó ningún archivo
+                if (!seSeleccionoArchivo) {
+                    // Si no se ha seleccionado ningún archivo, mostrar el mensaje de error
+                    fileError.text('Por favor, selecciona al menos un archivo.');
+                    fileError.css('display', 'inline');
+                    return false;
+                }
+
+                // Si no hay extensiones inválidas, ocultar el mensaje de error
+                if (!tieneExtensionInvalida) {
+                    fileError.css('display', 'none');
+                }
+
+                // Devolver true si todas las extensiones son válidas y se seleccionó al menos un archivo, de lo contrario false
+                return !tieneExtensionInvalida;
+            }
+
+
+            // Evento cuando se hace clic en el botón de enviar
+            $("button[type='submit']").click(function () {
+                validarFormulario();
+            });
+
+            // Evento cuando cambia el campo de archivo
+            $('#files-baja').change(function () {
+                validarFormulario();
+            });
+
+        });
+        
+
+    </script>
+
+}
+   

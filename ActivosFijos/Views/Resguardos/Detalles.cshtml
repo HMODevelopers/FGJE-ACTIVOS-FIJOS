@@ -1,0 +1,113 @@
+﻿
+@model ActivosFijos.Models.ViewModels.DetalleActivosViewModel
+
+@{
+    ViewBag.Title = "Detalle Activo";
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="alert alert-primary">
+            <h6 class="m-0">Simbología:</h6>
+            <p class="m-0">
+                Si algún campo, como por ejemplo 'Marca', aparece con el valor 'SIN MARCA', esto no significa que exista así en la base de datos. Solo indica que no se dispone de esa información.
+            </p>
+        </div>
+        <div class="card">
+            <div class="card-body">
+
+
+                @if (Model != null)
+                {
+
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <strong class="text-primary">Número de Inventario:</strong>
+                                    <p>@(Model.NumeroInventario != null ? Model.NumeroInventario.ToString() : "")</p>
+                                </div>
+                                <div class="col-md-3">
+                                    <strong class="text-primary">Descripción:</strong>
+                                    <p>@(Model.Descripcion != null ? Model.Descripcion : "")</p>
+                                </div>
+                                <div class="col-md-3">
+                                    <strong class="text-primary">Numero de Serie:</strong>
+                                    <p> @(Model.NumeroSerie != null ? Model.NumeroSerie : "SIN SERIE")</p>
+                                </div>
+                                <div class="col-md-3">
+                                    <strong class="text-primary">Categoria:</strong>
+                                    <p>@(Model.Categoria != null ? Model.Categoria : "SIN CATEGORIA")</p>
+                                </div>
+                            </div>
+                            <hr />
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <strong class="text-primary">Marca:</strong>
+                                    <p>@(Model.Marca != null ? Model.Marca : "SIN MARCA")</p>
+                                </div>
+                                <div class="col-md-3">
+                                    <strong class="text-primary">Concepto:</strong>
+                                    <p>@(Model.Concepto != null ? Model.Concepto : "SIN CONCEPTO")</p>
+                                </div>
+                                <div class="col-md-3">
+                                    <strong class="text-primary">Clasificador:</strong>
+                                    <p>@(Model.Clasificador != null ? Model.Clasificador : "SIN CLASIFICADOR")</p>
+                                </div>
+                                <div class="col-md-3">
+                                    <strong class="text-primary">Almacén:</strong>
+                                    <p>@(Model.Almacen != null ? Model.Almacen : "")</p>
+                                </div>
+                            </div>
+                            <hr />
+                            <div class="row">
+
+                                <div class="col-md-3">
+                                    <strong class="text-primary">Estado Físico:</strong>
+                                    <p>@(Model.EstadoFisico != null ? Model.EstadoFisico : "SIN ESTATUS FISICO")</p>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <strong class="text-primary">Estatus Activo:</strong>
+                                    <p>@(Model.EstadoActivo != null ? Model.EstadoActivo : "SIN ESTATUS ACTIVO")</p>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <!--INICIO FOTOS-->
+                    <p><strong class="text-primary">Fotos:</strong></p>
+                    <div>
+                        @if (Model.Fotos != null && Model.Fotos.Any())
+                        {
+                            foreach (var foto in Model.Fotos)
+                            {
+
+
+                                <a class="example-image-link" href="~/Content/FotosActivos/@foto.RutaFoto" data-lightbox="activo">
+                                    <img class="example-image" src="~/Content/FotosActivos/@foto.RutaFoto" alt="activo" width="150" height="150" style="border: 1px dashed; margin-right:5px;" />
+                                </a>
+
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-danger">No hay fotografias disponibles.</p>
+                        }
+                    </div>
+                    <!--FIN FOTOS-->
+                }
+                else
+                {
+                    <p class="text-danger">Activo No existe</p>
+                }
+                <br />
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info waves-effect" id="cerrar" onclick="window.location.href='@Url.Action("Index", "Resguardos")';">Atras</button>
+                </div>
+            </div>
+        </div>
+    </div> <!-- end card-->
+</div><!-- end col -->

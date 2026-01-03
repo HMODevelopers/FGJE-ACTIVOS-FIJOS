@@ -1,0 +1,209 @@
+﻿
+@{
+    ViewBag.Title = "Inventario Fisico";
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="alert alert-primary">
+            <h5 class="m-0">Nota:</h5>
+            <p class="m-0">
+                Para realizar la búsqueda de los activos fijos del empleado y efectuar el inventario correspondiente, es necesario ingresar el número de empleado en el campo provisto. Este número identifica al empleado cuyos activos serán inventariados.
+            </p>
+        </div>
+        <div class="row">
+            <div class="col-lg-2">
+                <div class="card">
+                    <div class="card-body">
+                        @using (Html.BeginForm("Buscar", "Inventario", FormMethod.Post, new { name = "buscarInventario", id = "buscarInventario" }))
+                        {
+                            <div class="form-group">
+                                <label>Numero Empleado</label>
+                                @Html.TextBox("numemp", null, new { placeholder = "", @class = "form-control" })
+                                <p></p>
+                                @Html.ValidationMessage("numemp", "", new { @class = "badge badge-danger" })
+                            </div>
+
+
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-success waves-effect waves-light">Buscar</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-10">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="alert alert-warning">
+                            <h5 class="m-0"><strong><i class="mdi mdi-alert-outline mr-2"></i>Activos Fijos:</strong></h5>
+                            <p class="m-0">
+                                A continuación, se presenta el listado de activos fijos correspondientes a la persona para la cual deseamos realizar un inventario.
+                            </p>
+                        </div>
+                        <div id="filtros" style="display:none;">
+                            @Html.Partial("_Filtros")
+                        </div>
+                        <div id="vista-previa">
+                            <!-- Aquí se mostrará la tabla de vista previa -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> <!-- end col-->
+</div><!-- end row -->
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ajax-unobtrusive/3.2.6/jquery.unobtrusive-ajax.min.js"></script>
+    <script src="~/Content/assets/js/pages/Filtros.js"></script>
+    <script>
+
+        $(document).ready(function () {
+
+            //Boton Buscar
+            $('#buscarInventario').submit(function (event) {
+
+                event.preventDefault(); // Evitar envío del formulario por defecto
+
+                // Validar que el campo tenga un valor
+                var numEmpValor = $('#numemp').val().trim();
+                var numempfiltros = $('#numempfiltros').val(numEmpValor);
+
+                if (numEmpValor === '') {
+                    $('[data-valmsg-for="numemp"]').text('Este campo es obligatorio').css('display', 'block'); // Mostrar el mensaje de error
+                    return false; // Detener el envío del formulario
+                } else {
+                    $('[data-valmsg-for="numemp"]').css('display', 'none'); // Ocultar el mensaje de error
+                }
+
+                // Si el campo tiene un valor, continuar con la solicitud AJAX
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: $(this).attr('method'),
+                    data: $(this).serialize(), // Serializar los datos del formulario
+                    success: function (data) {
+
+                        $('#filtros').css('display', 'block');//Mostramos los filtros que estan ocultos
+                        $('#vista-previa').html(data); // Mostrar la vista previa en el contenedor
+
+                    },
+                    error: function () {
+                        alert("Error al buscar los activos.");
+                    }
+                });
+            });
+
+
+            //Ocultar el mensaje de error cuando el campo tenga un valor
+            $('#numemp').on('input', function () {
+
+                if ($(this).val().trim() !== '') {
+                    $('[data-valmsg-for="numemp"]').css('display', 'none');
+                }
+            });
+
+            //Array contenedor de los IdActivos seleccionados.
+            var activosSeleccionados = [];
+            var observaciones = {};
+
+            // Evento click para checkboxes, seleciona y lo añade al array
+            $(document).on('click', 'input[type="checkbox"]', function () {
+                var activoId = $(this).val(); // Obtener el ID del activo seleccionado
+
+                // Si el checkbox está marcado, agregar el ID del activo al array
+                if ($(this).is(':checked')) {
+
+                    activosSeleccionados.push(activoId);
+
+                } else {
+
+                    // Si el checkbox está desmarcado, eliminar el ID del activo del array
+                    var index = activosSeleccionados.indexOf(activoId);
+
+                    if (index !== -1) {
+
+                        activosSeleccionados.splice(index, 1);
+                    }
+                }
+                
+                $("#selectedActivos").val(JSON.stringify(activosSeleccionados));
+
+            });
+
+            $(document).on('change', 'input[type="text"].observacion', function () {
+                var activoId = $(this).data('id'); // Obtener el ID del activo correspondiente
+                var observacion = $(this).val(); // Obtener el valor de la observación
+
+                // Actualizar el diccionario de observaciones
+                observaciones[activoId] = observacion;
+
+                console.log("Diccionario de Observaciones: ", observaciones);
+                $("#observaciones").val(JSON.stringify(observaciones));
+            });
+
+            // Función para restaurar los checkboxes seleccionados al cargar una nueva página de activos
+            function restaurarSeleccion() {
+                // Iterar sobre los checkboxes y marcar los activos seleccionados
+                $('input[type="checkbox"]').each(function () {
+                    var activoId = $(this).val();
+                    if (activosSeleccionados.includes(activoId)) {
+                        $(this).prop('checked', true);
+                    } else {
+                        $(this).prop('checked', false);
+                    }
+                });
+
+                $('input[type="text"].observacion').each(function () {
+                    var activoId = $(this).data('id');
+                    if (observaciones.hasOwnProperty(activoId)) {
+                        $(this).val(observaciones[activoId]);
+                    }
+                });
+
+                $("#selectedActivos").val(JSON.stringify(activosSeleccionados));
+                $("#observaciones").val(JSON.stringify(observaciones));
+            }
+
+            // Llamar a la función de restaurarSeleccion cuando se cargue la vista previa de activos
+            $('#vista-previa').on('DOMSubtreeModified', function () {
+                restaurarSeleccion();
+            });
+
+
+
+
+
+        });
+
+         function GenerarYAbrirPdf(NumeroEmpleado) {
+
+             //var activosJson = JSON.stringify(activos);
+
+                 // Realizar una solicitud al controlador para generar el PDF
+                 $.ajax({
+                     url: '@Url.Action("GenerarPdf", "Inventario")', // Reemplazar con la ruta correcta
+                     type: "POST",
+                     data: { NumeroEmpleado: NumeroEmpleado },
+                     success: function (pdfData) {
+                         // Crear un objeto Blob con el PDF en formato Base64
+                         var byteCharacters = atob(pdfData.PdfBase64);
+                         var byteNumbers = new Array(byteCharacters.length);
+                         for (var i = 0; i < byteCharacters.length; i++) {
+                             byteNumbers[i] = byteCharacters.charCodeAt(i);
+                         }
+                         var byteArray = new Uint8Array(byteNumbers);
+                         var blob = new Blob([byteArray], { type: 'application/pdf' });
+
+                         // Crear un objeto URL a partir del Blob
+                         var url = URL.createObjectURL(blob);
+
+                         // Abrir una nueva pestaña con el PDF
+                         window.open(url, '_blank');
+                     },
+                     error: function (error) {
+                         console.error("Error al generar o abrir el PDF." + error);
+                     }
+                 });
+         }
+    </script>
+}

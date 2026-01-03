@@ -1,0 +1,87 @@
+﻿@model IPagedList<ActivosFijos.Models.PLU_OP_Activos>
+
+@if (Model.Any())
+{
+
+    using (Html.BeginForm("GuardarInventario", "Inventario", FormMethod.Post))
+    {
+        <input type="hidden" name="numEmp" id="numEmp" value="@ViewBag.NumEmp" />
+        <input type="hidden" name="selectedActivos" id="selectedActivos" value="" />
+        <input type="hidden" name="observaciones" id="observaciones" value="" />
+
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Activo</th>
+                        <th>Numero Inventario</th>
+                        <th width="20%">Descripcion</th>
+                        <th>Numero Serie</th>
+                        <th>Categoria</th>
+                        <th>Marca</th>
+                        <th>Estado Fisico</th>
+                        <th>Estatus Activo</th>
+                        <th>Observacion</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var activo in Model)
+                    {
+                        <tr>
+                            <td>
+                                <input type="checkbox" class="activo-checkbox" value="@activo.IdActivos" />
+                            </td>
+                            <td><strong>@(activo.NumeroInventario ?? "")</strong></td>
+                            <td>@(activo.Descripcion ?? "")</td>
+                            <td>@(activo.NumeroSerie ?? "")</td>
+                            <td>@(activo.PLU_CAT_CategoriaActivo?.NombreCategoria ?? "")</td>
+                            <td>@(activo.PLU_CAT_MarcaActivo?.NombreMarca ?? "")</td>
+                            <td>@(activo.PLU_CAT_EstadoFisicoActivo?.Descripcion ?? "")</td>
+                            <td>@(activo.PLU_CAT_EstatusActivo?.Descripcion ?? "")</td>
+                            <td>
+                                @Html.TextBox("observaciones[" + activo.IdActivos + "]", null, new { @class = "form-control observacion", data_id = activo.IdActivos })
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="container-fluid">
+            <div class="row mt-3">
+                <div class="col-sm-8 col-12">
+                    <span>Activos del <strong>@(Model.LastItemOnPage > 0 ? Model.FirstItemOnPage : 0)</strong> al  <strong>@Model.LastItemOnPage</strong> de <strong>@Model.TotalItemCount</strong> Registros</span>
+                </div>
+                <div class="col-sm-4 col-12 text-right">
+                    <div id="pagedList" class="pagedList" data-otf-target="#IndexList">
+                        @Html.PagedListPager(Model, page => Url.Action("Buscar", new { numemp = ViewBag.NumEmp, page }), PagedList.Mvc.PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(PagedListRenderOptions.ClassicPlusFirstAndLast,
+                                                                                                                     new AjaxOptions
+                                                                                                                     {
+                                                                                                                         HttpMethod = "post",
+                                                                                                                         InsertionMode = InsertionMode.Replace,
+                                                                                                                         UpdateTargetId = "vista-previa",
+                                                                                                                         OnBegin = "ShowLoading",
+                                                                                                                         OnComplete = "HideLoading"
+                                                                                                                     }))
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-danger waves-effect" id="Cancelar" onclick="location.reload();">Cancelar</button>
+            <button data-ajax="true" data-reset="true" type="submit" class="btn btn-primary">Guardar Inventario</button>
+        </div>
+    }
+}
+else
+{
+    
+<div class="alert alert-danger">
+    <p class="m-2">
+        <strong>No se encontraron activos que mostrar por las siguientes razones posibles:</strong>
+
+    </p>
+    <p>1.- El empleado ya ha sido inventariado este año.</p>
+    <p>2.- El número de empleado no tiene ningún activo asignado.</p>
+    <p>3.- El número de empleado está mal escrito.</p>
+</div>
+}

@@ -1,0 +1,360 @@
+﻿@model ActivosFijos.Models.ViewModels.DashboardViewModel
+@{
+    ViewBag.Title = "Resumen";
+}
+
+
+<div class="row no-gutters">
+    <!-- Total de Activos -->
+    <div class="col-md-6 col-xl-3">
+        <div class="widget-rounded-circle bg-soft-info rounded-0 card-box mb-0">
+            <div class="row">
+                <div class="col-6">
+                    <div class="avatar-lg rounded-circle bg-soft-info">
+                        <i class="fe-bar-chart-2 font-22 avatar-title text-info"></i> <!-- Icono actualizado -->
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="text-right">
+                        <h3 class="text-dark mt-1">@Model.TotalActivos</h3>
+                        <p class="text-info mb-1 text-truncate">Total de Activos</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activos en Almacén -->
+    <div class="col-md-6 col-xl-3">
+        <div class="widget-rounded-circle bg-soft-primary rounded-0 card-box mb-0">
+            <div class="row">
+                <div class="col-6">
+                    <div class="avatar-lg rounded-circle bg-soft-primary">
+                        <i class="fe-box font-22 avatar-title text-primary"></i>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="text-right">
+                        <h3 class="text-dark mt-1">@Model.ActivosEnAlmacen</h3>
+                        <p class="text-primary mb-1 text-truncate">En Almacén</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activos en Resguardo -->
+    <div class="col-md-6 col-xl-3">
+        <div class="widget-rounded-circle bg-soft-warning rounded-0 card-box mb-0">
+            <div class="row">
+                <div class="col-6">
+                    <div class="avatar-lg rounded-circle bg-soft-warning">
+                        <i class="fe-user-check font-22 avatar-title text-warning"></i>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="text-right">
+                        <h3 class="text-dark mt-1">@Model.ActivosEnResguardo</h3>
+                        <p class="text-warning mb-1 text-truncate">En Resguardo</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activos Dados de Baja -->
+    <div class="col-md-6 col-xl-3">
+        <div class="widget-rounded-circle bg-soft-danger rounded-0 card-box mb-0">
+            <div class="row">
+                <div class="col-6">
+                    <div class="avatar-lg rounded-circle bg-soft-danger">
+                        <i class="fe-trash font-22 avatar-title text-danger"></i>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="text-right">
+                        <h3 class="text-dark mt-1">@Model.ActivosDadosDeBaja</h3>
+                        <p class="text-danger mb-1 text-truncate">Dados de Baja</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br />
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12">
+                        <label for="selectYear">Seleccionar Año</label>
+                        <select id="selectYear" class="form-control">
+                            <option value="2014">2014</option>
+                            <option value="2015">2015</option>
+                            <option value="2016">2016</option>
+                            <option value="2017">2017</option>
+                            <option value="2018">2018</option>
+                            <option value="2019">2019</option>
+                            <option value="2020">2020</option>
+                            <option value="2021">2021</option>
+                            <option value="2022">2022</option>
+                            <option value="2023">2023</option>
+                            <option value="2024">2024</option>
+                            <option value="2025">2025</option>
+                        </select>
+                    </div>
+                </div>
+            </div> <!-- end card-body -->
+        </div> <!-- end card-->
+    </div> <!-- end col-->
+</div>
+<!-- end row -->
+
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="card-widgets">
+                    <!-- Aquí puedes agregar widgets o botones adicionales si es necesario -->
+                </div>
+                <h4 class="header-title mb-0">Movimientos de Activos (@DateTime.Now.Year)</h4>
+
+                <div id="cardCollpase6" class="collapse pt-3 show" dir="ltr">
+                    <div id="apex-column-2" class="apex-charts"></div>
+                </div> <!-- collapsed end -->
+            </div> <!-- end card-body -->
+        </div> <!-- end card-->
+    </div> <!-- end col-->
+</div>
+
+<div class="row">
+
+    <div class="col-xl-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="card-widgets">
+                    <!-- Aquí puedes agregar widgets o botones adicionales si es necesario -->
+                </div>
+                <h4 class="header-title mb-0">Inventarios Realizados (@DateTime.Now.Year)</h4>
+
+                <div id="cardCollpase6" class="collapse pt-3 show" dir="ltr">
+                    <div id="apex-column-3" class="apex-charts"></div>
+                </div> <!-- collapsed end -->
+            </div> <!-- end card-body -->
+        </div> <!-- end card-->
+    </div> <!-- end col-->
+
+    <div class="col-xl-6">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="header-title">Inventarios por brigadista</h4>
+                <p class="text-muted font-13 mb-4"></p>
+                <div class="card-widgets">
+                    <!-- Aquí puedes agregar widgets o botones adicionales si es necesario -->
+                </div>
+
+
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Nombre Completo</th>
+                                <th>Total Inventarios</th>
+                                <th>Completos</th>
+                                <th>Pendientes</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventarios-table-body">
+                            <!-- El contenido de la tabla se llenará mediante JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div> <!-- end card-body -->
+        </div> <!-- end card-->
+    </div> <!-- end col-->
+</div>
+
+@section Scripts {
+
+
+    <script>
+
+        $(document).ready(function () {
+            // Inicializa el año actual y carga las estadísticas al cargar la página
+            var currentYear = new Date().getFullYear();
+            $('#selectYear').val(currentYear); // Establecer el año actual en el select
+            $('.año').text(currentYear);
+
+            OperacionesPorMes(currentYear);
+            InventariosPorMes(currentYear);
+            CargarTablaInventariosPorUsuario(currentYear);
+
+
+            // Evento para cuando se cambie el año en el select
+            $('#selectYear').on('change', function () {
+                var selectedYear = $(this).val();
+                $('.año').text(selectedYear);
+
+                OperacionesPorMes(selectedYear);
+                InventariosPorMes(selectedYear);
+                CargarTablaInventariosPorUsuario(selectedYear);
+            });
+
+
+        });
+
+        function OperacionesPorMes(anio) {
+            $.ajax({
+                url: '@Url.Action("GetOperacionesPorMes", "Home")',
+                method: 'GET',
+                data: { anio: anio },
+                success: function (data) {
+                    var countsByType = {
+                        'Altas': Array(12).fill(0),
+                        'Cambios': Array(12).fill(0),
+                        'Bajas': Array(12).fill(0)
+                    };
+
+                    data.forEach(function (item) {
+                        countsByType[item.Tipo][item.Month - 1] = item.Count;
+                    });
+
+                    // Opciones del gráfico
+                    var options = {
+                        series: [
+                            { name: 'Altas', data: countsByType['Altas'] },
+                            { name: 'Cambios de Resguardo', data: countsByType['Cambios'] },
+                            { name: 'Bajas', data: countsByType['Bajas'] }
+                        ],
+                        colors: ['#5089DE', '#f8cc6b', '#f1556c'],
+                        chart: {
+                            type: 'bar',
+                            height: 350
+                        },
+                        plotOptions: {
+                            bar: {
+                                horizontal: false,
+                                columnWidth: '55%',
+                                endingShape: 'rounded'
+                            }
+                        },
+                        dataLabels: { enabled: false },
+                        stroke: { show: true, width: 3, colors: ['transparent'] },
+                        xaxis: {
+                            categories: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+                        },
+                        yaxis: {
+                            title: { text: 'Activos' }
+                        },
+                        fill: { opacity: 1 },
+                        tooltip: {
+                            y: {
+                                formatter: function (val) {
+                                    return "" + val + " Activos";
+                                }
+                            }
+                        }
+                    };
+
+                    // Destruir gráfico existente y crear uno nuevo
+                    if (window.chartOperacionesPorMes) {
+                        window.chartOperacionesPorMes.destroy();
+                    }
+
+                    window.chartOperacionesPorMes = new ApexCharts(document.querySelector("#apex-column-2"), options);
+                    window.chartOperacionesPorMes.render();
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error al obtener los datos de las operaciones:', error);
+                }
+            });
+        }
+
+
+
+        function InventariosPorMes(anio) {
+            $.ajax({
+                url: '@Url.Action("GetInventariosPorMes", "Home")',
+                method: 'GET',
+                data: { anio: anio },
+                success: function (data) {
+                    var countsByMonth = Array(12).fill(0);
+
+                    data.forEach(function (item) {
+                        countsByMonth[item.Mes - 1] = item.Count;
+                    });
+
+                    // Opciones del gráfico
+                    var options = {
+                        series: [
+                            { name: 'Inventarios Realizados', data: countsByMonth }
+                        ],
+                        colors: ['#5089DE'],
+                        chart: { type: 'bar', height: 350 },
+                        plotOptions: {
+                            bar: {
+                                horizontal: false,
+                                columnWidth: '55%',
+                                endingShape: 'rounded'
+                            }
+                        },
+                        dataLabels: { enabled: false },
+                        stroke: { show: true, width: 3, colors: ['transparent'] },
+                        xaxis: {
+                            categories: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+                        },
+                        yaxis: { title: { text: 'Número de Inventarios' } },
+                        fill: { opacity: 1 },
+                        tooltip: {
+                            y: {
+                                formatter: function (val) {
+                                    return "" + val + " Inventarios";
+                                }
+                            }
+                        }
+                    };
+
+                    // Destruir gráfico existente y crear uno nuevo
+                    if (window.chartInventariosPorMes) {
+                        window.chartInventariosPorMes.destroy();
+                    }
+
+                    window.chartInventariosPorMes = new ApexCharts(document.querySelector("#apex-column-3"), options);
+                    window.chartInventariosPorMes.render();
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error al obtener los datos de los inventarios:', error);
+                }
+            });
+        }
+
+
+
+        function CargarTablaInventariosPorUsuario(anio) {
+            $.ajax({
+                url: '@Url.Action("GetInventariosPorUsuario", "Home")',
+                method: 'GET',
+                data: { anio: anio },
+                success: function (data) {
+                    var tableBody = $('#inventarios-table-body');
+                    tableBody.empty();
+
+                    data.forEach(function (item) {
+                        tableBody.append('<tr>' +
+                            '<td>' + item.NombreCompleto + '</td>' +
+                            '<td>' + item.TotalInventarios + '</td>' +
+                            '<td>' + item.Completos + '</td>' +
+                            '<td>' + item.Pendientes + '</td>' +
+                        '</tr>');
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error al obtener los datos de inventarios por usuario:', error);
+                }
+            });
+        }
+
+
+    </script>
+}

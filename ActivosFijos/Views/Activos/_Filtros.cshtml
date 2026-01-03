@@ -1,0 +1,123 @@
+﻿
+<div class="card-header" style="border-color:darkgray; border-style:dotted;">
+    <h5>Filtros</h5>
+
+    <div class="row">
+        <div class="col-lg-12">
+            @using (Ajax.BeginForm("Index", "Activos", new AjaxOptions { HttpMethod = "GET", UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" }))
+            {
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="field-1" class="control-label">Numero Inventario</label>
+                            <div class="input-group">
+                                @Html.TextBox("numeroinventario", null, new { @class = "form-control filtrar" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="field-1" class="control-label">Descripción</label>
+                            <div class="input-group">
+                                @Html.TextBox("descripcion", null, new { @class = "form-control filtrar" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="field-1" class="control-label">Categoria</label>
+                            <div class="input-group">
+                                @Html.DropDownList("IdCategoria", ViewBag.Categorias as SelectList, "-- Seleccione una categoría --", new { @class = "form-control filtrar" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="field-1" class="control-label">Concepto</label>
+                            <div class="input-group">
+                                @Html.DropDownList("IdConcepto", ViewBag.Conceptos as SelectList, "-- Seleccione un Concepto --", new { @class = "form-control filtrar" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="field-1" class="control-label">Numero Serie</label>
+                            <div class="input-group">
+                                @Html.TextBox("NumeroSerie",null, new { @class = "form-control filtrar" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="field-1" class="control-label">Almacen</label>
+                            <div class="input-group">
+                                @Html.DropDownList("IdAlmacen", ViewBag.Almacenes as SelectList, "-- Seleccione un Almacen --", new { @class = "form-control filtrar" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="field-1" class="control-label">Estado Fisico</label>
+                            <div class="input-group">
+                                @Html.DropDownList("IdEstadoFisico", ViewBag.EstadoFisico as SelectList, "-- Seleccione un Estado Fisico --", new { @class = "form-control filtrar" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+
+                            <label for="field-1" class="control-label">Estatus Activo</label>
+                            <div class="input-group">
+                                @Html.DropDownList("IdEstatusActivo", ViewBag.EstatusActivo as SelectList, "-- Seleccione un Estatus Activo --", new { @class = "form-control filtrar" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            }
+        </div>
+    </div>
+</div>

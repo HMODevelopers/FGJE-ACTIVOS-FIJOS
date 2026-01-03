@@ -1,0 +1,75 @@
+﻿@model ActivosFijos.Models.PLU_CAT_Facturas
+@{
+    ViewBag.Title = "Agregar";
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="alert alert-primary">
+            <h6 class="m-0">Simbología:</h6>
+            <p class="m-0">
+                * Campos obligatorios
+            </p>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                @using (Html.BeginForm("Guardar", "Facturas", new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "divMenu" }))
+                {
+                    <div class="modal-body p-4">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="field-1" class="control-label">Folio Factura <span class="text-danger">*</span></label>
+                                    @Html.EditorFor(x => x.FolioFactura, new { htmlAttributes = new { @class = "form-control", placeholder = "", } })
+                                    @Html.ValidationMessageFor(x => x.FolioFactura, null, new { @class = "badge badge-danger" })
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="IdProveedor" class="control-label">Proveedor<span class="text-danger">*</span></label>
+                                    @Html.DropDownList("IdProveedor", ViewBag.Proveedores as SelectList, "-- Seleccione un Proveedor --", new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(x => x.IdProveedor, null, new { @class = "badge badge-danger" })
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="IdRecurso" class="control-label">Recurso<span class="text-danger">*</span></label>
+                                    @Html.DropDownList("IdRecurso", ViewBag.Recursos as SelectList, "-- Seleccione un Factura --", new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(x => x.IdRecurso, null, new { @class = "badge badge-danger" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="field-1" class="control-label">Total Factura <span class="text-danger">*</span></label>
+                                    @Html.EditorFor(x => x.Total, new { htmlAttributes = new { @class = "form-control", placeholder = "", } })
+                                    @Html.ValidationMessageFor(x => x.Total, null, new { @class = "badge badge-danger" })
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="field-1" class="control-label">Fecha Factura <span class="text-danger">*</span></label>
+                                    @Html.EditorFor(x => x.FechaFactura, new { htmlAttributes = new { @class = "form-control", placeholder = "", @type="Date" } })
+                                    @Html.ValidationMessageFor(x => x.FechaFactura, null, new { @class = "badge badge-danger" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    @Html.CheckBoxFor(x => x.Activo)<br /><label for="Activo" class="control-label">Activo<span class="text-danger"></span></label>
+                                    @Html.ValidationMessageFor(x => x.Activo, null, new { @class = "badge badge-danger" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-info waves-effect" id="cerrar" onclick="window.location.href='@Url.Action("Index", "Facturas")';">Atras</button>
+                        <button data-ajax="true" data-reset="true" type="submit" class="btn btn-success waves-effect waves-light" id="guardar">Guardar</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div> <!-- end card-->
+</div><!-- end col -->

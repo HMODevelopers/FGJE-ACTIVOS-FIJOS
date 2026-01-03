@@ -1,0 +1,123 @@
+﻿@model PagedList.IPagedList<ActivosFijos.Models.ViewModels.CambiosActivosViewModel>
+@using PagedList.Mvc;
+
+@{
+    ViewBag.Title = "Lista de Cambios";
+}
+
+@Html.Partial("_FiltrosCambios")
+
+<div class="card">
+    <div class="card-body">
+        <div id="resultadosBusqueda">
+            <!-- Aquí se mostrarán los resultados de la búsqueda -->
+            @Html.Partial("_ListaCambios", Model) <!-- Agregar esto para mostrar los resultados iniciales -->
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="pdfModalLabel">Vista previa oficio cambios resguardo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí se cargará el visor del PDF -->
+                <iframe id="visorPDF" src="" frameborder="0" style="width: 100%; height: 600px;"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ajax-unobtrusive/3.2.6/jquery.unobtrusive-ajax.min.js"></script>
+    <script src="~/Content/assets/js/pages/Filtros.js"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function cargarPDF(rutaPdf) {
+            const visor = document.getElementById('visorPDF');
+            visor.src = rutaPdf; // Ajusta esta ruta si necesitas un prefijo, como "/archivos/" + rutaPdf
+        }
+
+        function GenerarYAbrirPdf(FolioAlta = "") {
+
+
+            $.ajax({
+                url: '@Url.Action("ObtenerActivosPorFolioCambios", "Resguardos")',
+                type: "GET",
+                data: { FolioCambio: FolioAlta },
+                success: function (response) {
+                    if (!response.success) {
+                        alert(response.message);
+                        return;
+                    }
+
+                    var Activos = JSON.stringify(response.IdActivos);
+                    var NumeroEmpleado = response.DatosGenerales.NumeroEmpleado;
+                    var fechaCreacion = response.DatosGenerales.FechaCreacion;
+
+                    // Llamar a la función que genera el PDF con los datos correctos
+                    GenerarPdf(Activos, NumeroEmpleado,fechaCreacion);
+                },
+                error: function (error) {
+                    console.error("Error al obtener los activos.", error);
+                }
+            });
+        }
+
+        function GenerarPdf(Activos, NumeroEmpleado, FechaCreacion) {
+
+
+
+            var fechaISO = convertirFechaDotNet(FechaCreacion);
+
+            $.ajax({
+                url: '@Url.Action("GenerarPdf", "Resguardos")',
+                type: "POST",
+                data: {
+                    activos: Activos,
+                    NumeroEmpleado: NumeroEmpleado,
+                    TipoMovimiento: 2,
+                    FechaCreacion: fechaISO
+                },
+                success: function (pdfData) {
+                    // Crear un objeto Blob con el PDF en formato Base64
+                    var byteCharacters = atob(pdfData.PdfBase64);
+                    var byteNumbers = new Array(byteCharacters.length);
+                    for (var i = 0; i < byteCharacters.length; i++) {
+                        byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    }
+                    var byteArray = new Uint8Array(byteNumbers);
+                    var blob = new Blob([byteArray], { type: 'application/pdf' });
+
+                    // Crear un objeto URL a partir del Blob
+                    var url = URL.createObjectURL(blob);
+
+                    // Abrir una nueva pestaña con el PDF
+                    window.open(url, '_blank');
+                },
+                error: function (error) {
+                    console.error("Error al generar o abrir el PDF." + error);
+                }
+            });
+        }
+
+        function convertirFechaDotNet(fechaDotNet) {
+            var match = fechaDotNet.match(/\d+/); // Extrae solo los números
+            if (match) {
+                var timestamp = parseInt(match[0], 10); // Convierte a número
+                return new Date(timestamp).toISOString(); // Convierte a formato ISO
+            }
+            return null; // Retorna null si el formato es incorrecto
+        }
+    </script>
+
+}
+
+
+

@@ -1,0 +1,302 @@
+﻿
+@{
+    ViewBag.Title = "Baja Definitiva";
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="alert alert-primary">
+            <h5 class="m-0">Intrucciones:</h5>
+            <p class="m-0">
+                Para realizar la búsqueda de los activos fijos y proceder con la baja definitiva, es necesario ingresar el número de lote en el campo provisto. Este número identifica el lote de los artículos que serán dados de baja.
+            </p>
+        </div>
+        <div class="row">
+            <div class="col-lg-2">
+                <div class="card">
+                    <div class="card-body">
+                        @using (Html.BeginForm("BuscarInventario", "Activos", FormMethod.Post, new { name = "buscarInventario", id = "buscarInventario" }))
+                        {
+                            <div class="form-group">
+                                <label>Numero Inventario</label>
+                                @Html.TextBox("NumeroInventario", null, new { placeholder = "", @class = "form-control" })
+                                <p></p>
+                                @Html.ValidationMessage("NumeroInventario", "", new { @class = "badge badge-danger" })
+                            </div>
+
+                            <div class="form-group">
+                                <label>Numero Serie</label>
+                                @Html.TextBox("NumeroSerie", null, new { placeholder = "", @class = "form-control" })
+                                <p></p>
+                                @Html.ValidationMessage("NumeroSerie", "", new { @class = "badge badge-danger" })
+                            </div>
+
+                            <div class="modal-footer" style="display: none;">
+                                <button type="submit" class="btn btn-success waves-effect waves-light">Buscar</button>
+                            </div>
+                        }
+
+                        <div id="noResultsMessage" style="display:none;">
+                            <div class="alert alert-danger">
+                                <h5 class="m-0"><strong><i class="mdi mdi-alert-outline mr-2"></i>Atención:</strong></h5>
+                                <p class="m-0">No se encontraron resultados para el número de inventario proporcionado. Por favor, verifique si el activo se encuentra en el almacén o ha sido dado de baja.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-10">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="alert alert-warning">
+                            <h5 class="m-0"><strong><i class="mdi mdi-alert-outline mr-2"></i>Aviso:</strong></h5>
+                            <p class="m-0">
+                                A continuación, se presenta el listado de activos correspondientes a la baja definitiva que deseamos realizar.
+                            </p>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-lg-12">
+                                <label for="employee-search">Numero de Lote:</label>
+                                <input type="text" class="form-control" name="NumeroLote" id="NumeroLote">
+                                <span id="lote_error" style="display: none;" class="badge badge-danger">
+                                    Ingrese un número de lote que corresponda a los artículos que serán dados de baja definitiva.
+                                </span>
+                            </div>
+
+                        </div>
+
+                        <table class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Numero Inventario</th>
+                                    <th>Descripción</th>
+                                    <th>Numero de Serie</th>
+                                    <th>Categoria</th>
+                                    <th>Marca</th>
+                                </tr>
+                            </thead>
+                            <tbody id="activosTableBody">
+                                <!-- Los activos se acumularán aquí -->
+                            </tbody>
+                        </table>
+
+                        <input type="submit" class="btn btn-success" name="guardar" value="Guardar" id="Guardar" />
+                        <input type="button" class="btn btn-danger" name="cancelar" value="Cancelar" id="Cancelar" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> <!-- end col-->
+</div><!-- end row -->
+
+
+@section Scripts {
+    <script>
+
+        $(document).ready(function () {
+
+
+
+            $('#NumeroInventario').focus();
+
+            $('#buscarInventario').submit(function (event) {
+                event.preventDefault(); // Previene la acción por defecto del formulario
+                var $form = $(this);
+                var $tableBody = $('#activosTableBody');
+                var $noResultsMessage = $('#noResultsMessage');
+                var $numeroInventario = $('#NumeroInventario'); // Obtén el campo de texto
+                var $numeroSerie = $('#NumeroSerie'); // Obtén el campo de texto
+
+                $.ajax({
+                    type: $form.attr('method'),
+                    url:  $form.attr('action'),
+                    data: $form.serialize(),
+                    success: function (data) {
+                        if (data.length === 0) {
+                            $noResultsMessage.show();
+                            $numeroInventario.val('').focus();
+                            $numeroSerie.val('');
+
+                        } else {
+                            $noResultsMessage.hide();
+                            data.forEach(function (activo) {
+                                // Verificar si el NumeroInventario ya existe en la tabla
+                                var exists = false;
+                                $('#activosTableBody tr').each(function () {
+                                    var existingNumeroInventario = $(this).find('td').eq(2).text();
+                                    if (existingNumeroInventario === activo.NumeroInventario) {
+                                        exists = true;
+                                        return false; // Salir del each
+                                    }
+                                });
+
+                                // Si no existe, agregar la nueva fila
+                                if (!exists) {
+                                    var row = '<tr>' +
+                                        '<td>' + activo.IdActivos + '</td>' +
+                                        '<td>' + activo.NumeroInventario + '</td>' +
+                                        '<td>' + (activo.Descripcion || '') + '</td>' +
+                                        '<td>' + (activo.NumeroSerie || '') + '</td>' +
+                                        '<td>' + (activo.Categoria || '') + '</td>' +
+                                        '<td>' + (activo.Marca || '') + '</td>' +
+                                        '</tr>';
+                                    $tableBody.append(row);
+                                }
+                            });
+                        }
+                        // Limpiar el campo de texto y enfocar
+                        $numeroInventario.val('').focus();
+                        $numeroSerie.val('');
+                    }
+                });
+            });
+
+            $('#NumeroLote').change(function () {
+                $('#empleado_error').hide();
+            });
+
+            $('#Guardar').click(function() {
+               var numeroLote = $('#NumeroLote').val();
+
+                // Validación de número de lote
+                if (!numeroLote) {
+                    $('#lote_error').show();
+                    return;
+                }
+
+                var activosSeleccionados = [];
+                $('#activosTableBody tr').each(function() {
+                    var idActivo = $(this).find('td').eq(0).text().trim();
+                    if (idActivo) {
+                        activosSeleccionados.push(idActivo);
+                    }
+                });
+
+                // Validación de lista de activos
+                if (activosSeleccionados.length === 0) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Atención',
+                        text: 'No hay activos en la lista para dar de baja definitiva.',
+                        confirmButtonText: 'Entendido'
+                    });
+                    return;
+                }
+
+                // Confirmación antes de enviar
+                Swal.fire({
+                    type: 'question',
+                    title: 'Confirmación',
+                    text: '¿Está seguro de que desea dar de baja estos activos?',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sí, dar de baja',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.value) {
+                        $.ajax({
+                            type: 'POST',
+                            url: '@Url.Action("GuardarBajaDefinitiva", "Activos")',
+                            data: {
+                                numeroLote: numeroLote,
+                                selectedActivos: JSON.stringify(activosSeleccionados)
+                            },
+                            success: function(response) {
+                                if (response.response) {
+                                    Swal.fire({
+                                        type: 'success',
+                                        title: 'Éxito',
+                                        text: response.message,
+                                        onClose: function () {
+                                            // Generar y abrir PDF
+                                            //GenerarYAbrirPdf(numeroLote);
+
+                                            // Esperar un momento para redirigir a la página principal
+                                            setTimeout(function() {
+                                                window.location.href = '@Url.Action("ListaBajasDefinitivas", "Activos")';
+                                            }, 2000);
+                                        }
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        type: 'error',
+                                        title: 'Error',
+                                        text: response.message
+                                    });
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                Swal.fire({
+                                    type: 'error',
+                                    title: 'Error',
+                                    text: `Ocurrió un error: ${error}`
+                                });
+                            }
+                        });
+                    }
+                });
+                        });
+
+            $('#Cancelar').click(function () {
+                // Limpiar la tabla de activos
+                $('#activosTableBody').empty();
+
+                // Restablecer el select2 al valor predeterminado
+                $('#employee-search').val(null).trigger('change');
+                $('#lote_error').hide();
+                // Limpiar los campos de búsqueda
+                $('#NumeroInventario').val('');
+                $('#NumeroSerie').val('');
+                $('#NumeroLote').val('');
+
+                $('#NumeroInventario').focus();
+
+                // Opcional: Mostrar un mensaje de confirmación o aviso
+                Swal.fire({
+                    type: 'info',
+                    title: 'Acción Cancelada',
+                    text: 'Todos los datos han sido borrados.',
+                });
+            });
+
+
+           function  GenerarYAbrirPdf(NumeroEmpleado) {
+
+             //var activosJson = JSON.stringify(activos);
+
+             // Realizar una solicitud al controlador para generar el PDF
+              $.ajax({
+                    url: '@Url.Action("GenerarPdf", "Inventario")', // Reemplazar con la ruta correcta
+                    type: "POST",
+                    data: { NumeroEmpleado: NumeroEmpleado },
+                    success: function (pdfData) {
+                        // Crear un objeto Blob con el PDF en formato Base64
+                        var byteCharacters = atob(pdfData.PdfBase64);
+                        var byteNumbers = new Array(byteCharacters.length);
+                        for (var i = 0; i < byteCharacters.length; i++) {
+                            byteNumbers[i] = byteCharacters.charCodeAt(i);
+                        }
+                        var byteArray = new Uint8Array(byteNumbers);
+                        var blob = new Blob([byteArray], { type: 'application/pdf' });
+
+                        // Crear un objeto URL a partir del Blob
+                        var url = URL.createObjectURL(blob);
+
+                        // Abrir una nueva pestaña con el PDF
+                        window.open(url, '_blank');
+                    },
+                    error: function (error) {
+                        console.error("Error al generar o abrir el PDF." + error);
+                    }
+               });
+        }
+
+    });
+
+
+    </script>
+}
+

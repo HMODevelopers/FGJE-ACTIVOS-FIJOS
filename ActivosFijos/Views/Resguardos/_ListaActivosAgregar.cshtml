@@ -1,0 +1,61 @@
+﻿@model IPagedList<ActivosFijos.Models.PLU_OP_Activos>
+
+@if (Model.Any())
+{
+
+    <div class="table-responsive">
+        <table class="table table-bordered" id="sourceTable">
+            <thead>
+                <tr>
+                    <th>Activo</th>
+                    <th>Numero Inventario</th>
+                    <th width="20%">Descripcion</th>
+                    <th>Numero de Serie</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var activo in Model)
+                {
+                    <tr>
+                        <td class=" align-content-center">
+                             <input type="checkbox" class="activo-checkbox" value="@activo.IdActivos" />
+                        </td>
+                        <td class="activo-numeroinventario"><strong>@(activo.NumeroInventario ?? "")</strong></td>
+                        <td class="activo-descripcion">@(activo.Descripcion ?? "")</td>
+                        <td class="activo-numeroserie">@(activo.NumeroSerie ?? "")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="container-fluid">
+        <div class="row mt-3">
+            <div class="col-sm-8 col-12">
+                <span>Activos del <strong>@(Model.LastItemOnPage > 0 ? Model.FirstItemOnPage : 0)</strong> al  <strong>@Model.LastItemOnPage</strong> de <strong>@Model.TotalItemCount</strong> Registros</span>
+            </div>
+            <div class="col-sm-12 col-12 text-right">
+                <div id="pagedList" class="pagedList" data-otf-target="#IndexList">
+                    
+                    @Html.PagedListPager(Model, page => Url.Action("Agregar", new { numemp = ViewBag.NumEmp, numeroinventario = ViewBag.numeroinventario, descripcion = ViewBag.descripcion, NumeroSerie = ViewBag.NumeroSerie, page }), PagedList.Mvc.PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(PagedListRenderOptions.ClassicPlusFirstAndLast,
+                                                                                                                                new AjaxOptions
+                                                                                                                                {
+                                                                                                                                    HttpMethod = "get",
+                                                                                                                                    InsertionMode = InsertionMode.Replace,
+                                                                                                                                    UpdateTargetId = "vista-previa",
+                                                                                                                                    OnBegin = "ShowLoading",
+                                                                                                                                    OnComplete = "HideLoading"
+                                                                                                                                }))
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+}
+else
+{
+
+    <div class="alert alert-danger">
+        <p class="m-2"><strong>No se encontraron activos que mostrar.</strong></p>
+    </div>
+}

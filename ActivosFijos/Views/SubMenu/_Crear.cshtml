@@ -1,0 +1,76 @@
+﻿@model ActivosFijos.Models.PLU_CONF_SubMenu
+
+<div id="con-close-modal" class="modal fade bs-example-modal-center bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Agregar SubMenú</h4>
+                <button type="button" id="close" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+
+            @using (Html.BeginForm("Guardar", "SubMenu", new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "divMenu" }))
+            {
+                <div class="modal-body p-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="field-1" class="control-label">Titulo SubMenú</label>
+                                @Html.EditorFor(x => x.TituloSubMenu, new { htmlAttributes = new { @class = "form-control", placeholder = "" } })
+                                @Html.ValidationMessageFor(x => x.TituloSubMenu, null, new { @class = "badge badge-danger" })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="field-1" class="control-label">Menú</label>
+                                @Html.DropDownListFor(m => m.IdMenu, ViewBag.menu as SelectList, "Seleccionar Menú", new { @class = "form-control" })
+                                @Html.ValidationMessageFor(x => x.IdMenu, null, new { @class = "badge badge-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="field-1" class="control-label">Controlador</label>
+                                @Html.EditorFor(x => x.Controlador, new { htmlAttributes = new { @class = "form-control", placeholder = "" } })
+                                @Html.ValidationMessageFor(x => x.Controlador, null, new { @class = "badge badge-danger" })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="field-1" class="control-label">Acción</label>
+                                @Html.EditorFor(x => x.Accion, new { htmlAttributes = new { @class = "form-control", placeholder = "" } })
+                                @Html.ValidationMessageFor(x => x.Accion, null, new { @class = "badge badge-danger" })
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="field-1" class="control-label">Orden</label>
+                                @Html.EditorFor(x => x.Orden, new { htmlAttributes = new { @class = "form-control", placeholder = "" } })
+                                @Html.ValidationMessageFor(x => x.Orden, null, new { @class = "badge badge-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+
+                                @Html.CheckBoxFor(x => x.Activo, new { htmlAttributes = new { @class = "form-control", placeholder = "" } })
+                                <label for="Activo">Activo</label>
+                                @Html.ValidationMessageFor(x => x.Activo, null, new { @class = "badge badge-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary waves-effect" id="cerrar" data-dismiss="modal">Cerrar</button>
+                    <button data-ajax="true" data-reset="true" type="submit" class="btn btn-info waves-effect waves-light" id="guardar">Guardar</button>
+                </div>
+            }
+
+        </div>
+    </div>
+</div><!-- /.modal -->

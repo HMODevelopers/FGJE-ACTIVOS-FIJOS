@@ -1,0 +1,134 @@
+﻿@model PagedList.IPagedList<ActivosFijos.Models.ViewModels.DetalleBajasActivosViewModel>
+@using PagedList.Mvc;
+
+@{
+    string folioBaja = ViewBag.FolioBaja as string;
+    string numeroLote = ViewBag.NumeroLote as string;
+    string numeroInventario = ViewBag.NumeroInventario as string;
+    string fechaDesdeS = ViewBag.FechaDesde != null ? ((DateTime)ViewBag.FechaDesde).ToString("yyyy-MM-dd") : null;
+    string fechaHastaS = ViewBag.FechaHasta != null ? ((DateTime)ViewBag.FechaHasta).ToString("yyyy-MM-dd") : null;
+}
+
+@if (Model.Count > 0)
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered" width="100%">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>
+                        @Ajax.ActionLink("Folio Baja", "ListaBajas",
+                            new { Orden = ViewBag.FolioBajaSortParam, FolioBaja = folioBaja, NumeroLote = numeroLote, NumeroInventario = numeroInventario, FechaDesde = fechaDesdeS, FechaHasta = fechaHastaS },
+                            new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                        <i class="mdi mdi-sort"></i>
+                    </th>
+                    <th>
+                        @Ajax.ActionLink("Número Lote", "ListaBajas",
+                            new { Orden = ViewBag.NumeroLoteSortParam, FolioBaja = folioBaja, NumeroLote = numeroLote, NumeroInventario = numeroInventario, FechaDesde = fechaDesdeS, FechaHasta = fechaHastaS },
+                            new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                        <i class="mdi mdi-sort"></i>
+                    </th>
+                    <th>
+                        @Ajax.ActionLink("Número Inventario", "ListaBajas",
+                            new { Orden = ViewBag.NumeroInventarioSortParam, FolioBaja = folioBaja, NumeroLote = numeroLote, NumeroInventario = numeroInventario, FechaDesde = fechaDesdeS, FechaHasta = fechaHastaS },
+                            new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                        <i class="mdi mdi-sort"></i>
+                    </th>
+                    <th>
+                        @Ajax.ActionLink("Categoría", "ListaBajas",
+                            new { Orden = ViewBag.CategoriaSortParam, FolioBaja = folioBaja, NumeroLote = numeroLote, NumeroInventario = numeroInventario, FechaDesde = fechaDesdeS, FechaHasta = fechaHastaS },
+                            new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                        <i class="mdi mdi-sort"></i>
+                    </th>
+                    <th>
+                        @Ajax.ActionLink("Descripción", "ListaBajas",
+                            new { Orden = ViewBag.DescripcionSortParam, FolioBaja = folioBaja, NumeroLote = numeroLote, NumeroInventario = numeroInventario, FechaDesde = fechaDesdeS, FechaHasta = fechaHastaS },
+                            new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                        <i class="mdi mdi-sort"></i>
+                    </th>
+                    <th>
+                        @Ajax.ActionLink("Número Serie", "ListaBajas",
+                            new { Orden = ViewBag.NumeroSerieSortParam, FolioBaja = folioBaja, NumeroLote = numeroLote, NumeroInventario = numeroInventario, FechaDesde = fechaDesdeS, FechaHasta = fechaHastaS },
+                            new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                        <i class="mdi mdi-sort"></i>
+                    </th>
+                    <th>
+                        @Ajax.ActionLink("Marca", "ListaBajas",
+                            new { Orden = ViewBag.MarcaSortParam, FolioBaja = folioBaja, NumeroLote = numeroLote, NumeroInventario = numeroInventario, FechaDesde = fechaDesdeS, FechaHasta = fechaHastaS },
+                            new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                        <i class="mdi mdi-sort"></i>
+                    </th>
+                    <th>
+                        @Ajax.ActionLink("Fecha Baja", "ListaBajas",
+                            new { Orden = ViewBag.FechaBajaSortParam, FolioBaja = folioBaja, NumeroLote = numeroLote, NumeroInventario = numeroInventario, FechaDesde = fechaDesdeS, FechaHasta = fechaHastaS },
+                            new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                        <i class="mdi mdi-sort"></i>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    var i = Model.FirstItemOnPage;
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@i</td>
+                            <td class="text-center">@item.FolioBajas</td>
+                            <td class="text-center">@item.NumeroLote</td>
+                            <td class="text-center">@item.NumeroInventario</td>
+                            <td class="text-center">@item.Categoria</td>
+                            <td class="text-center">@item.Descripcion</td>
+                            <td class="text-center">@item.NumeroSerie</td>
+                            <td class="text-center">@item.Marca</td>
+                            <td class="text-center">@item.FechaBaja.ToString("yyyy-MM-dd")</td>
+                        </tr>
+                        i++;
+                    }
+                }
+            </tbody>
+        </table>
+
+        <div class="container-fluid">
+            <div class="row mt-3">
+                <div class="col-sm-8 col-12">
+                    <span>Registros del <strong>@(Model.LastItemOnPage > 0 ? Model.FirstItemOnPage : 0)</strong> al  <strong>@Model.LastItemOnPage</strong> de <strong>@Model.TotalItemCount</strong></span>
+                </div>
+                <div class="col-sm-12 col-12 text-right">
+                    <div id="pagedList" class="pagedList" data-otf-target="#IndexList">
+                        @Html.PagedListPager(
+                            Model,
+                            iPagina => Url.Action("ListaBajas",
+                                new
+                                     {
+                                    iPagina,
+                                    iPerPage = ViewBag.PerPage,
+                                    Orden = ViewBag.Order,
+                                    FolioBaja = folioBaja,
+                                    NumeroLote = numeroLote,
+                                    NumeroInventario = numeroInventario,
+                                    FechaDesde = fechaDesdeS,
+                                    FechaHasta = fechaHastaS
+                                }
+                            ),
+                            PagedList.Mvc.PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(
+                                PagedListRenderOptions.ClassicPlusFirstAndLast,
+                                new AjaxOptions
+                                     {
+                                    HttpMethod = "get",
+                                    InsertionMode = InsertionMode.Replace,
+                                    UpdateTargetId = "resultadosBusqueda",
+                                    OnBegin = "ShowLoading",
+                                    OnComplete = "HideLoading"
+                                }
+                            )
+                        )
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <p>No se encontraron resultados.</p>
+}

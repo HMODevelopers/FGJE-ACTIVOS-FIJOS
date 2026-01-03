@@ -1,0 +1,59 @@
+﻿@model IPagedList<ActivosFijos.Models.ViewModels.InventariosViewModel>
+@using PagedList.Mvc;
+
+@{
+    ViewBag.Title = "Inventarios";
+}
+
+@Html.Partial("_Filtros")
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+
+            <div class="card-body">
+                <div id="resultadosBusqueda">
+                    <!-- Aquí se mostrarán los resultados de la búsqueda -->
+                    @Html.Partial("_ListaInventarios", Model) <!-- Agregar esto para mostrar los resultados iniciales -->
+                </div>
+            </div>
+        </div>
+    </div> <!-- end col-->
+</div><!-- end row -->
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ajax-unobtrusive/3.2.6/jquery.unobtrusive-ajax.min.js"></script>
+    <script src="~/Content/assets/js/pages/Filtros.js"></script>
+
+    <script>
+
+        function GenerarYAbrirPdf(NumeroEmpleado) {
+
+        // Realizar una solicitud al controlador para generar el PDF
+        $.ajax({
+            url: '@Url.Action("GenerarPdf2", "Inventario")', // Reemplazar con la ruta correcta
+            type: "POST",
+            data: { FolioInventario: NumeroEmpleado },
+            success: function (pdfData) {
+                // Crear un objeto Blob con el PDF en formato Base64
+                var byteCharacters = atob(pdfData.PdfBase64);
+                var byteNumbers = new Array(byteCharacters.length);
+                for (var i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                var byteArray = new Uint8Array(byteNumbers);
+                var blob = new Blob([byteArray], { type: 'application/pdf' });
+
+                // Crear un objeto URL a partir del Blob
+                var url = URL.createObjectURL(blob);
+
+                // Abrir una nueva pestaña con el PDF
+                window.open(url, '_blank');
+            },
+            error: function (error) {
+                console.error("Error al generar o abrir el PDF." + error);
+            }
+        });
+}
+    </script>
+}

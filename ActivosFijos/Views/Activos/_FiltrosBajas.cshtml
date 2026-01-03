@@ -1,0 +1,102 @@
+﻿@* _FiltrosBajas.cshtml *@
+<div class="card-header" style="border-color:darkgray; border-style:dotted;">
+    <h5>Filtros</h5>
+
+    <div class="row">
+        <div class="col-lg-12">
+            @using (Ajax.BeginForm("ListaBajas", "Activos",
+              new AjaxOptions { HttpMethod = "GET", UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" },
+              new { id = "frmFiltrosBajas" }))
+            {
+                <div class="row">
+
+                    <!-- Folio de Baja -->
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="control-label">Folio de Baja</label>
+                            <div class="input-group">
+                                @Html.TextBox("FolioBaja",
+                                  ViewBag.FolioBaja as string,
+                                  new { @class = "form-control filtrar", @type = "text", @placeholder = "Ej: BAJ-2025-001" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Número de Lote -->
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="control-label">Número de Lote</label>
+                            <div class="input-group">
+                                @Html.TextBox("NumeroLote",
+                                  ViewBag.NumeroLote as string,
+                                  new { @class = "form-control filtrar", @type = "text", @placeholder = "Ej: 12" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Número de Inventario (nuevo) -->
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="control-label">Número de Inventario</label>
+                            <div class="input-group">
+                                @Html.TextBox("NumeroInventario",
+                                  ViewBag.NumeroInventario as string,
+                                  new { @class = "form-control filtrar", @type = "text", @placeholder = "Ej: INV-000123" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fecha Desde -->
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="control-label">Fecha Desde</label>
+                            <div class="input-group">
+                                @Html.TextBox("FechaDesde",
+                                  ViewBag.FechaDesde != null ? ((DateTime)ViewBag.FechaDesde).ToString("yyyy-MM-dd") : null,
+                                  new { @class = "form-control filtrar", @type = "date" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fecha Hasta -->
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="control-label">Fecha Hasta</label>
+                            <div class="input-group">
+                                @Html.TextBox("FechaHasta",
+                                  ViewBag.FechaHasta != null ? ((DateTime)ViewBag.FechaHasta).ToString("yyyy-MM-dd") : null,
+                                  new { @class = "form-control filtrar", @type = "date" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            }
+        </div>
+    </div>
+</div>

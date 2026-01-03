@@ -1,0 +1,116 @@
+﻿@model ActivosFijos.Models.PLU_OP_Adscripcion
+
+@{
+    ViewBag.Title = "Editar Adscripción";
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="alert alert-primary">
+            <h6 class="m-0">Simbología:</h6>
+            <p class="m-0">
+                * Campos obligatorios
+            </p>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                @using (Html.BeginForm("Guardar", "Empleados", new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "divMenu" }))
+                {
+                    @Html.HiddenFor(x => x.IdAdscripcion)
+                    @Html.HiddenFor(x => x.IdEmpleado)
+                    @Html.HiddenFor(x => x.NumeroEmpleado)
+                    @Html.HiddenFor(x => x.Ingreso)
+                    @Html.HiddenFor(x => x.RangoCategoria)
+                    @Html.HiddenFor(x => x.Entidad)
+                    @Html.HiddenFor(x => x.FechaInicioAdscripcion)
+                    @Html.HiddenFor(x => x.TipoMovimiento, new { @Value = string.IsNullOrEmpty(Model.TipoMovimiento) ? "A" : Model.TipoMovimiento })
+                    @Html.HiddenFor(x => x.FechaRegistro)
+                    @Html.HiddenFor(x => x.MigradodRH)
+                    <div class="modal-body p-4">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="IdUnidadAdministrativa" class="control-label">Dirección Adscripción</label>
+                                    @Html.DropDownList("Corporacion", ViewBag.UnidadAdministrativa as SelectList, "-- Seleccione una Unidad --", new { @class = "form-control", id = "Corporacion" })
+                                    @Html.ValidationMessageFor(x => x.Corporacion, null, new { @class = "badge badge-danger" })
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="AreaAdscripcion" class="control-label">Área Adscripción</label>
+                                    @Html.DropDownList("Area", Enumerable.Empty<SelectListItem>(), "-- Seleccione un Área --", new { @class = "form-control", id = "Area" })
+                                    @Html.ValidationMessageFor(x => x.Area, null, new { @class = "badge badge-danger" })
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="field-1" class="control-label">Puesto<span class="text-danger">*</span></label>
+                                    @Html.EditorFor(x => x.PuestoFuncional, new { htmlAttributes = new { @class = "form-control", placeholder = "" } })
+                                    @Html.ValidationMessageFor(x => x.PuestoFuncional, null, new { @class = "badge badge-danger" })
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="IdMarca" class="control-label">Municipio</label>
+                                    @Html.DropDownList("Municipio", ViewBag.Municipio as SelectList, "-- Seleccione un Municipio --", new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(x => x.Municipio, null, new { @class = "badge badge-danger" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-info waves-effect" id="cerrar" onclick="window.location.href='@Url.Action("Adscripcion", "Empleados", new { id = Model.IdEmpleado})';">Atras</button>
+                        <button data-ajax="true" data-reset="true" type="submit" class="btn btn-success waves-effect waves-light" id="guardar">Guardar</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div> <!-- end card-->
+</div><!-- end col -->
+
+@section Scripts {
+
+    <script>
+    $(document).ready(function() {
+        // Función para cargar las áreas basadas en la corporación seleccionada
+        function loadAreas(corporacionId) {
+            if (corporacionId) {
+                $.ajax({
+                    url: '@Url.Action("GetAreasAdscripcion", "Empleados")',
+                    type: 'GET',
+                    data: { Unidad: corporacionId },
+                    success: function(data) {
+                        var $areaAdscripcion = $('#Area');
+                        $areaAdscripcion.empty(); // Limpiar opciones anteriores
+
+                        // Agregar la opción predeterminada
+                        $areaAdscripcion.append('<option value="">-- Seleccione un Área --</option>');
+
+                        // Llenar con las nuevas opciones
+                        $.each(data, function(index, item) {
+                            $areaAdscripcion.append('<option value="' + item.Value + '">' + item.Text + '</option>');
+                        });
+
+                        // Seleccionar el área actual si ya hay una preseleccionada
+                        var selectedArea = '@Model.Area';
+                        if (selectedArea) {
+                            $areaAdscripcion.val(selectedArea);
+                        }
+                    }
+                });
+            }
+        }
+
+        // Llamar a la función loadAreas cuando la página se carga
+        var initialCorporacionId = $('#Corporacion').val();
+        loadAreas(initialCorporacionId);
+
+        // Llamar a la función loadAreas cuando el usuario cambie la corporación
+        $('#Corporacion').change(function() {
+            var corporacionId = $(this).val();
+            loadAreas(corporacionId);
+        });
+    });
+    </script>
+
+}

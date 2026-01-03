@@ -1,0 +1,87 @@
+﻿@model PagedList.IPagedList<ActivosFijos.Models.PLU_CAT_MarcaActivo>
+
+@if (Model.Count > 0)
+{
+
+    <div class="row">
+        <div class="col-md-12">
+            @Html.Raw($"<a type='button' href='{Url.Action("Agregar")}' class='btn btn-success waves-effect waves-light'><i class='icon-plus mr-1'></i> Agregar Marca</a>")
+        </div>
+    </div>
+    <br />
+    <table class="table table-bordered">
+        <tr>
+            <th>
+                @Ajax.ActionLink("#", "Index", new { sOrder = ViewBag.IdMarcaSortParam, }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                <i class="mdi mdi-sort"></i>
+            </th>
+            <th>
+                @Ajax.ActionLink("Nombre Marca", "Index", new { sOrder = ViewBag.NombreMarcaSortParam, }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                <i class="mdi mdi-sort"></i>
+            </th>
+            <th>Estatus</th>
+            <th>Fecha Creación</th>
+            <th><label></label>Acciones</th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.IdMarca)</td>
+                <td><strong>@Html.DisplayFor(modelItem => item.NombreMarca)</strong></td>
+                <td class="text-center">
+                    @{
+                        string sColor = "";
+                        if (item.Activo == false)
+                        {
+                            sColor = "text-danger";
+                        }
+                        else if (item.Activo == true)
+                        {
+                            sColor = "text-success";
+                        }
+                    }
+
+                    <i class="mdi mdi-checkbox-blank-circle @sColor"></i>
+                </td>
+                <td>@Html.DisplayFor(modelItem => item.FechaCreacion)</td>
+                <td>
+                    <center>
+                        <a href="@Url.Action("Editar", new { id = item.IdMarca })" class="btn btn-primary"><i class="icon-pencil"></i></a>
+
+                    </center>
+                </td>
+            </tr>
+        }
+    </table>
+
+
+    <div class="container-fluid">
+        <div class="row mt-3">
+
+            <div class="col-sm-8 col-12">
+                <span>Activos del <strong>@(Model.LastItemOnPage > 0 ? Model.FirstItemOnPage : 0)</strong> al  <strong>@Model.LastItemOnPage</strong> de <strong>@Model.TotalItemCount</strong> Registros</span>
+            </div>
+            <div class="col-12 text-right">
+                <div id="pagedList" class="pagedList" data-otf-target="#IndexList">
+                    @Html.PagedListPager(Model, iPagina => Url.Action("Index", new { iPagina, iPerPage = ViewBag.PerPage, sOrder = ViewBag.Order, }), PagedList.Mvc.PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(PagedListRenderOptions.ClassicPlusFirstAndLast,
+                          new AjaxOptions
+                               {
+                              HttpMethod = "get",
+                              InsertionMode = InsertionMode.Replace,
+                              UpdateTargetId = "resultadosBusqueda",
+                              OnBegin = "ShowLoading",
+                              OnComplete = "HideLoading"
+                          }))
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+}
+else
+{
+    <p>No se encontraron resultados.</p>
+}

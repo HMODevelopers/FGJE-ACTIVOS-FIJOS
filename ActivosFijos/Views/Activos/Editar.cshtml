@@ -1,0 +1,265 @@
+﻿@model ActivosFijos.Models.PLU_OP_Activos
+
+@{
+    ViewBag.Title = "Editar Activo";
+    var selectedConceptoId = Model.IdConcepto;
+    var selectedClasificadorId = Model.IdClasificadores;
+}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="alert alert-primary">
+            <h6 class="m-0">Simbología:</h6>
+            <p class="m-0">
+                * Campos obligatorios
+            </p>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                @using (Html.BeginForm("Guardar", "Activos", new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "divMenu" }))
+                {
+                    @Html.HiddenFor(x => x.IdActivos)
+                    @Html.HiddenFor(x => x.IdEstatusActivo)
+                    <div class="modal-body p-4">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="field-1" class="control-label">Numero Inventario<span class="text-danger">*</span></label>
+                                    @Html.EditorFor(x => x.NumeroInventario, new { htmlAttributes = new { @class = "form-control", placeholder = "", @readonly = "readonly" } })
+                                    @Html.ValidationMessageFor(x => x.NumeroInventario, null, new { @class = "badge badge-danger" })
+
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="field-1" class="control-label">Descripción<span class="text-danger">*</span></label>
+                                    @Html.EditorFor(x => x.Descripcion, new { htmlAttributes = new { @class = "form-control", placeholder = "" } })
+                                    @Html.ValidationMessageFor(x => x.Descripcion, null, new { @class = "badge badge-danger" })
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="field-1" class="control-label">Numero de Serie<span class="text-danger">*</span></label>
+                                    @Html.EditorFor(x => x.NumeroSerie, new { htmlAttributes = new { @class = "form-control", placeholder = "" } })
+                                    @Html.ValidationMessageFor(x => x.NumeroSerie, null, new { @class = "badge badge-danger" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="IdCategoria" class="control-label">Categoría</label>
+                                    @Html.DropDownList("IdCategoria", ViewBag.Categorias as SelectList, "-- Seleccione una categoría --", new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(x => x.IdCategoria, null, new { @class = "badge badge-danger" })
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="IdMarca" class="control-label">Marca</label>
+                                    @Html.DropDownList("IdMarca", ViewBag.Marca as SelectList, "-- Seleccione una marca --", new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(x => x.IdMarca, null, new { @class = "badge badge-danger" })
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="IdConcepto" class="control-label">Concepto</label>
+                                    @Html.DropDownList("IdConcepto", ViewBag.Conceptos as SelectList, "-- Seleccione un Concepto --", new { @class = "form-control", @id = "IdConcepto" })
+                                    @Html.ValidationMessageFor(x => x.IdConcepto, null, new { @class = "badge badge-danger" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="IdClasificadores" class="control-label">Clasificadores</label>
+                                    @Html.DropDownList("IdClasificadores", new SelectList(Enumerable.Empty<SelectListItem>()), "-- Seleccione un Clasificador --", new { @class = "form-control", @id = "IdClasificadores" })
+                                    @Html.ValidationMessageFor(x => x.IdClasificadores, null, new { @class = "badge badge-danger" })
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="IdFactura" class="control-label">Factura</label>
+                                    @Html.DropDownList("IdFactura", ViewBag.Facturas as SelectList, "-- Seleccione un Factura --", new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(x => x.IdFactura, null, new { @class = "badge badge-danger" })
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="IdProveedor" class="control-label">Proveedor</label>
+                                    @Html.DropDownList("IdProveedor", ViewBag.Proveedores as SelectList, "-- Seleccione un Proveedor --", new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(x => x.IdProveedor, null, new { @class = "badge badge-danger" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="IdRecurso" class="control-label">Recurso</label>
+                                    @Html.DropDownList("IdRecurso", ViewBag.Recursos as SelectList, "-- Seleccione un Factura --", new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(x => x.IdRecurso, null, new { @class = "badge badge-danger" })
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="IdAlmacen" class="control-label">Almacen</label>
+                                    @Html.DropDownList("IdAlmacen", ViewBag.Almacenes as SelectList, "-- Seleccione un Almacen --", new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(x => x.IdAlmacen, null, new { @class = "badge badge-danger" })
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="IdEstadoFisico" class="control-label">Estado Fisico</label>
+                                    @Html.DropDownList("IdEstadoFisico", ViewBag.EstadoFisico as SelectList, "-- Seleccione un Estado Fisico --", new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(x => x.IdEstadoFisico, null, new { @class = "badge badge-danger" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="IdRecurso" class="control-label">Fotos</label>
+                                    <input type="file" name="files" id="files" class="form-control" multiple accept=".png, .jpg, .jpeg" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <p><strong>Fotos Activo:</strong></p>
+                                <div>
+                                    @if (ViewBag.FotosActivos != null && ViewBag.FotosActivos.Count > 0)
+                                    {
+                                        foreach (var foto in ViewBag.FotosActivos)
+                                        {
+                                            <div style="position:relative; display:inline-block;">
+                                                <a class="example-image-link" href="~/Content/FotosActivos/@foto.RutaFoto" data-lightbox="activo">
+                                                    <img class="example-image" src="~/Content/FotosActivos/@foto.RutaFoto" alt="activo" width="150" height="150" style="border: 1px dashed; margin-right:5px;" />
+                                                </a>
+                                                <button type="button" class="btn btn-danger btn-rounded waves-effect waves-light eliminar-foto" data-foto-id="@foto.IdFoto" style="position: absolute; top: 5px; right: 10px; border-radius: 150px;"><i class="icon-close"></i></button>
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <p>No hay fotografías disponibles.</p>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-info waves-effect" id="cerrar" onclick="window.location.href='@Url.Action("Index", "Activos")';">Atras</button>
+                        <button data-ajax="true" data-reset="true" type="submit" class="btn btn-success waves-effect waves-light" id="guardar">Guardar</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div> <!-- end card-->
+</div><!-- end col -->
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+
+            var selectedConceptoId = '@selectedConceptoId';
+            var selectedClasificadorId = '@selectedClasificadorId';
+
+            // Function to load clasificadores based on the selected concept
+            function loadClasificadores(conceptoId, selectedClasificadorId) {
+                if (conceptoId) {
+                    $.ajax({
+                        url: '@Url.Action("GetClasificadores", "Activos")',
+                        type: 'GET',
+                        data: { IdConcepto: conceptoId },
+                        success: function(data) {
+                            var clasificadorDropdown = $('#IdClasificadores');
+                            clasificadorDropdown.empty();
+                            clasificadorDropdown.append($('<option>').text('-- Seleccione un Clasificador --').attr('value', ''));
+                            $.each(data, function(i, clasificador) {
+                                var option = $('<option>').text(clasificador.ClasificadorDescripcion).attr('value', clasificador.IdClasificadores);
+                                if (clasificador.IdClasificadores == selectedClasificadorId) {
+                                    option.attr('selected', 'selected');
+                                }
+                                clasificadorDropdown.append(option);
+                            });
+                        },
+                        error: function() {
+                            alert('Error loading data. Please try again.');
+                        }
+                    });
+                } else {
+                    $('#IdClasificadores').empty();
+                    $('#IdClasificadores').append($('<option>').text('-- Seleccione un Clasificador --').attr('value', ''));
+                }
+            }
+
+            // Initial load for the edit scenario
+            if (selectedConceptoId) {
+                loadClasificadores(selectedConceptoId, selectedClasificadorId);
+            }
+
+            // Change event for the concept dropdown
+            $('#IdConcepto').change(function() {
+                var selectedConcepto = $(this).val();
+                loadClasificadores(selectedConcepto, null);
+            });
+
+            //validacion de los tipos de archivo que admite el input file.
+            $('#files').change(function () {
+                var allowedExtensions = /(\.jpg|\.jpeg|\.png)$/i;
+                var files = $(this)[0].files;
+                var isValid = true;
+
+                for (var i = 0; i < files.length; i++) {
+                    if (!allowedExtensions.exec(files[i].name)) {
+                        isValid = false;
+                        break;
+                    }
+                }
+
+                if (!isValid) {
+                    Swal.fire({
+                        type: 'error',
+                        title: 'Archivo no permitido',
+                        text: 'Solo se permiten archivos PNG, JPG, JPEG.',
+                    });
+
+                    $(this).val(''); // Clear the input
+                } else {
+                    $('#fileError').hide();
+                }
+            });
+
+
+            $('.eliminar-foto').on('click', function() {
+                var fotoId = $(this).data('foto-id');
+
+                $.ajax({
+                    url: '@Url.Action("EliminarFoto", "Activos")',
+                    type: 'POST',
+                    data: { IdFoto: fotoId },
+                    success: function (response) {
+
+                        Swal.fire({
+                            title: "¡Buen Trabajo!",
+                            text: response.message,
+                            type: "success"
+                        }).then((result) => {
+                            window.location.reload(true);
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        
+                        Swal.fire({
+                            title: "¡Error!",
+                            text: response.message,
+                            type: "error"
+                        }).then((result) => {
+                            window.location.reload(true);
+                        });
+                    }
+                });
+            });
+
+        });
+    </script>
+}

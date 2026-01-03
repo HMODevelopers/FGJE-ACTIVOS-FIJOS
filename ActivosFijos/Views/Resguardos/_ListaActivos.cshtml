@@ -1,0 +1,131 @@
+﻿@model PagedList.IPagedList<ActivosFijos.Models.PLU_OP_Activos>
+
+@if (Model.Count > 0)
+{
+    <div class="table-responsive">
+        <table class="table table-bordered" width="100%">
+            <thead>
+                <tr>
+                    <th>
+                        @Ajax.ActionLink("#", "Index", new { Orden = ViewBag.IdActivosSortParam , numeroinventario = ViewBag.numeroinventario, descripcion = ViewBag.descripcion, IdCategoria = ViewBag.IdCategoria, numeroEmpleado = ViewBag.numeroEmpleado, apellidoPaterno = ViewBag.apellidoPaterno, apellidoMaterno = ViewBag.apellidoMaterno, nombreEmpleado = ViewBag.nombreEmpleado }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                        <i class="mdi mdi-sort"></i>
+                    </th>
+                    <th>
+                        @Ajax.ActionLink("# Resguardo", "Index", new { Orden = ViewBag.NumeroResguardoSortParm , numeroinventario = ViewBag.numeroinventario, descripcion = ViewBag.descripcion, IdCategoria = ViewBag.IdCategoria, numeroEmpleado = ViewBag.numeroEmpleado, apellidoPaterno = ViewBag.apellidoPaterno, apellidoMaterno = ViewBag.apellidoMaterno, nombreEmpleado = ViewBag.nombreEmpleado }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                        <i class="mdi mdi-sort"></i>
+                    </th>
+                    <th>
+                        @Ajax.ActionLink("Nombre Empleado", "Index", new { Orden = ViewBag.NombreEmpleadoSortParam , numeroinventario = ViewBag.numeroinventario, descripcion = ViewBag.descripcion, IdCategoria = ViewBag.IdCategoria, numeroEmpleado = ViewBag.numeroEmpleado, apellidoPaterno = ViewBag.apellidoPaterno, apellidoMaterno = ViewBag.apellidoMaterno, nombreEmpleado = ViewBag.nombreEmpleado }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                        <i class="mdi mdi-sort"></i>
+                    </th>
+                    <th>
+                        @Ajax.ActionLink("# de Inventario", "Index", new { Orden = ViewBag.NumeroInventarioSortParm , numeroinventario = ViewBag.numeroinventario, descripcion = ViewBag.descripcion, IdCategoria = ViewBag.IdCategoria, numeroEmpleado = ViewBag.numeroEmpleado, apellidoPaterno = ViewBag.apellidoPaterno, apellidoMaterno = ViewBag.apellidoMaterno, nombreEmpleado = ViewBag.nombreEmpleado }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                        <i class="mdi mdi-sort"></i>
+                    </th>
+
+                    <th>
+                        @Ajax.ActionLink("Descripción", "Index", new { Orden = ViewBag.DescripcionSortParm , numeroinventario = ViewBag.numeroinventario, descripcion = ViewBag.descripcion, IdCategoria = ViewBag.IdCategoria, numeroEmpleado = ViewBag.numeroEmpleado, apellidoPaterno = ViewBag.apellidoPaterno, apellidoMaterno = ViewBag.apellidoMaterno, nombreEmpleado = ViewBag.nombreEmpleado }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                        <i class="mdi mdi-sort"></i>
+                    </th>
+
+                    <th>
+                        @Ajax.ActionLink("Categoria", "Index", new { Orden = ViewBag.CategoriaSortParm , numeroinventario = ViewBag.numeroinventario, descripcion = ViewBag.descripcion, IdCategoria = ViewBag.IdCategoria, numeroEmpleado = ViewBag.numeroEmpleado, apellidoPaterno = ViewBag.apellidoPaterno, apellidoMaterno = ViewBag.apellidoMaterno, nombreEmpleado = ViewBag.nombreEmpleado }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                        <i class="mdi mdi-sort"></i>
+                    </th>
+                    <th>
+                        @Ajax.ActionLink("Estado Fisico", "Index", new { Orden = ViewBag.EstadoFisocoSortParam , numeroinventario = ViewBag.numeroinventario, descripcion = ViewBag.descripcion, IdCategoria = ViewBag.IdCategoria, numeroEmpleado = ViewBag.numeroEmpleado, apellidoPaterno = ViewBag.apellidoPaterno, apellidoMaterno = ViewBag.apellidoMaterno, nombreEmpleado = ViewBag.nombreEmpleado }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                        <i class="mdi mdi-sort"></i>
+                    </th>
+                    <th>Estatus Activo</th>
+                    <th><label></label>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(modelItem => item.IdActivos)</td>
+                        <td>@Html.DisplayFor(modelItem => item.PLU_OP_Resguardo.NumeroResguardo)</td>
+                        <td>@Html.DisplayFor(modelItem => item.PLU_OP_Resguardo.PLU_OP_Empleados.NombreCompleto)</td>
+                        <th>@Html.DisplayFor(modelItem => item.NumeroInventario)</th>
+                        <td>@Html.DisplayFor(modelItem => item.Descripcion)</td>
+                        <td>@Html.DisplayFor(modelItem => item.PLU_CAT_CategoriaActivo.NombreCategoria)</td>
+                        <td>@Html.DisplayFor(modelItem => item.PLU_CAT_EstadoFisicoActivo.Descripcion)</td>
+                        <td class="text-center">
+                            @{
+                                string sColor = "";
+                                if (item.IdEstatusActivo == 2)
+                                {
+                                    sColor = "text-success";
+                                }
+                                else if (item.IdEstatusActivo == 3)
+                                {
+                                    sColor = "text-success";
+                                }
+                            }
+
+                            <i class="mdi mdi-checkbox-blank-circle @sColor"></i>
+                        </td>
+                        <!-- Agrega más columnas aquí según tus necesidades -->
+                        <td>
+                            <center>
+                                <div class="btn-group dropdown">
+                                    <a href="javascript:void(0);" class="btn btn-success waves-effect waves-light table-action-btn dropdown-toggle arrow-none btn btn-light btn-sm" data-toggle="dropdown" aria-expanded="false"><i class="icon-options"></i></a>
+                                    <div class="dropdown-menu dropdown-menu-right">
+
+                                        @Html.Raw($"<a href='{Url.Action("Detalles", new { id = item.IdActivos })}' class='dropdown-item'><i class='icon-eye mr-2 text-muted font-18 vertical-middle'></i>Detalle Activo</a>")
+                                        @Html.Raw($"<a href='{Url.Action("Editar", "Activos", new { id = item.IdActivos })}' class='dropdown-item'>" + "<i class=\"icon-pencil mr-2 text-muted font-18 vertical-middle\"></i>Editar Activo</a>")
+                                        @Html.Raw($"<a href='{Url.Action("ImprimirEtiqueta", "Activos", new { id = item.IdActivos })}' class='dropdown-item' target='_blank'><i class='icon-printer mr-2 text-muted font-18 vertical-middle'></i>Imprimir etiquetas pequeña</a>")
+                                        @Html.Raw($"<a href='{Url.Action("ImprimirEtiquetaGrande", "Activos", new { id = item.IdActivos })}' class='dropdown-item' target='_blank'><i class='icon-printer mr-2 text-muted font-18 vertical-middle'></i>Imprimir etiqueta grande</a>")
+                                        @{
+                                            if (item.IdEstatusActivo == 3)
+                                            {
+
+                                                @Html.Raw($"<a href='{Url.Action("Editar", new { id = item.IdActivos })}' class='dropdown-item'><i class='icon-pencil mr-2 text-muted font-18 vertical-middle'></i>Editar Activo</a>")
+                                                @Html.Raw($"<a href='{Url.Action("BajaActivo", new { id = item.IdActivos })}' class='dropdown-item'><i class='icon-trash mr-2 text-muted font-18 vertical-middle'></i>Baja Activo</a>")
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            </center>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+
+
+        <div class="container-fluid">
+            <div class="row mt-3">
+
+                <div class="col-sm-8 col-12">
+                    <span>Activos del <strong>@(Model.LastItemOnPage > 0 ? Model.FirstItemOnPage : 0)</strong> al  <strong>@Model.LastItemOnPage</strong> de <strong>@Model.TotalItemCount</strong> Registros</span>
+                </div>
+                <div class="col-sm-12 col-12 text-right">
+                    <div id="pagedList" class="pagedList" data-otf-target="#IndexList">
+                        @Html.PagedListPager(Model, iPagina => Url.Action("Index", new { iPagina, iPerPage = ViewBag.PerPage, Orden = ViewBag.Order, numeroinventario = ViewBag.numeroinventario, descripcion = ViewBag.descripcion, IdCategoria = ViewBag.IdCategoria, numeroEmpleado = ViewBag.numeroEmpleado, apellidoPaterno = ViewBag.apellidoPaterno, apellidoMaterno = ViewBag.apellidoMaterno, nombreEmpleado = ViewBag.nombreEmpleado , NumeroSerie = ViewBag.NumeroSerie}), PagedList.Mvc.PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(PagedListRenderOptions.ClassicPlusFirstAndLast,
+                              new AjaxOptions
+                              {
+                                  HttpMethod = "get",
+                                  InsertionMode = InsertionMode.Replace,
+                                  UpdateTargetId = "resultadosBusqueda",
+                                  OnBegin = "ShowLoading",
+                                  OnComplete = "HideLoading"
+                              }))
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div> <!-- end table-responsive-->
+}
+else
+{
+  
+<p>No se encontraron resultados.</p>
+                        
+}
+

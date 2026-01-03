@@ -1,0 +1,114 @@
+﻿
+
+<div class="card-header" style="border-color:darkgray; border-style:dotted;">
+    <h5>Filtros</h5>
+
+    <div class="row">
+        <div class="col-lg-12">
+            @using (Ajax.BeginForm("Index", "Resguardos", new AjaxOptions { HttpMethod = "GET", UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" }))
+            {
+
+
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="field-1" class="control-label">Nombre Empleado</label>
+                            <div class="input-group">
+                                @Html.TextBox("nombreEmpleado", null, new { @class = "form-control filtrar" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="field-1" class="control-label">Apellido Paterno</label>
+                            <div class="input-group">
+                                @Html.TextBox("apellidoPaterno", null, new { @class = "form-control filtrar" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="field-1" class="control-label">Apellido Materno</label>
+                            <div class="input-group">
+                                @Html.TextBox("apellidoMaterno", null, new { @class = "form-control filtrar" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="field-1" class="control-label">Número de Empleado</label>
+                            <div class="input-group">
+                                @Html.TextBox("numeroEmpleado", null, new { @class = "form-control filtrar" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="field-1" class="control-label">Numero Inventario</label>
+                            <div class="input-group">
+                                @Html.TextBox("numeroinventario", null, new { @class = "form-control filtrar" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="field-1" class="control-label">Descripción</label>
+                            <div class="input-group">
+                                @Html.TextBox("descripcion", null, new { @class = "form-control filtrar" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="field-1" class="control-label">Numero Serie</label>
+                            <div class="input-group">
+                                @Html.TextBox("NumeroSerie", null, new { @class = "form-control filtrar" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            }
+        </div>
+    </div>
+</div>
