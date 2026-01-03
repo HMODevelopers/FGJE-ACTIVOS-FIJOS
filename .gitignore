@@ -1,0 +1,116 @@
+############################################
+# Visual Studio 2022 / ASP.NET MVC (.NET)
+############################################
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio workspace / cache
+.vs/
+.vscode/
+.idea/
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+
+# Visual Studio test results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+# NuGet (general)
+*.nupkg
+*.snupkg
+.nuget/
+# If you use PackageReference (most modern projects), DO NOT commit packages/
+# If you use packages.config and want to commit packages/ (not recommended), remove next line.
+packages/
+
+# ASP.NET MVC / IIS Express
+.vs/config/
+.vs/ProjectSettings.json
+.vs/VSWorkspaceState.json
+*.iisexpress
+.vs/iisExpress/
+**/.vs/iisExpress/
+**/.vs/config/
+
+# Publish output (don’t commit)
+[Aa]pp_[Pp]ublish/
+publish/
+PublishProfiles/
+*.publishsettings
+
+# Web deploy / packages output
+*.zip
+*.tar
+*.tar.gz
+
+# Local settings / secrets (avoid committing)
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+*.pfx
+*.p12
+*.cer
+*.key
+*.pem
+
+# ASP.NET temporary files (mostly .NET Framework)
+**/App_Data/*.mdf
+**/App_Data/*.ldf
+**/App_Data/*.sdf
+
+# Logs
+*.log
+
+# OS / misc
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ReSharper / Rider
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# JetBrains
+.idea/
+
+# Node / frontend (if you use it for assets)
+node_modules/
+dist/
+build/
+.cache/
+
+# Coverage
+coverage/
+*.coverage
+*.coveragexml
+
+# SQL Server LocalDB / db files (common accidental commits)
+*.mdf
+*.ldf
+*.ndf
+*.bak
+
+# Generated files
+*.tmp
+*.temp
+*.swp
+*~
