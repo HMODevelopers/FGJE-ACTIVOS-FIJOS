@@ -297,41 +297,25 @@
 
           // ======= Generar y abrir PDF por FOLIO =======
           function GenerarYAbrirPdf2(folio) {
-            $.ajax({
-              url: '@Url.Action("GenerarPdf2", "Inventario")',
-              type: 'POST',
-              data: { FolioInventario: folio },
-              success: function (pdfData) {
-                if (!pdfData || !pdfData.PdfBase64 || pdfData.PdfBase64 === "null") {
-                  Swal.fire({ type: 'error', title: 'PDF', text: 'No se recibió el PDF.' });
-                  return;
-                }
-                const byteCharacters = atob(pdfData.PdfBase64);
-                const byteNumbers = Array.from(byteCharacters, c => c.charCodeAt(0));
-                const blob = new Blob([new Uint8Array(byteNumbers)], { type: 'application/pdf' });
-                window.open(URL.createObjectURL(blob), '_blank');
+            openPdfFromUrl('@Url.Action("GenerarPdf2", "Inventario")', { FolioInventario: folio }, {
+              onEmpty: function () {
+                Swal.fire({ type: 'error', title: 'PDF', text: 'No se recibió el PDF.' });
               },
-              error: function () { Swal.fire({ type: 'error', title: 'PDF', text: 'Error al generar/abrir el PDF.' }); }
+              onError: function () {
+                Swal.fire({ type: 'error', title: 'PDF', text: 'Error al generar/abrir el PDF.' });
+              }
             });
           }
 
           // ======= Generar y abrir PDF por EMPLEADO/AÑO (fallback) =======
           function GenerarYAbrirPdfByEmpleado(NumeroEmpleado) {
-            $.ajax({
-              url: '@Url.Action("GenerarPdf", "Inventario")',
-              type: 'POST',
-              data: { NumeroEmpleado: NumeroEmpleado },
-              success: function (pdfData) {
-                if (!pdfData || !pdfData.PdfBase64 || pdfData.PdfBase64 === "null") {
-                  Swal.fire({ type: 'error', title: 'PDF', text: 'No se recibió el PDF.' });
-                  return;
-                }
-                const byteCharacters = atob(pdfData.PdfBase64);
-                const byteNumbers = Array.from(byteCharacters, c => c.charCodeAt(0));
-                const blob = new Blob([new Uint8Array(byteNumbers)], { type: 'application/pdf' });
-                window.open(URL.createObjectURL(blob), '_blank');
+            openPdfFromUrl('@Url.Action("GenerarPdf", "Inventario")', { NumeroEmpleado: NumeroEmpleado }, {
+              onEmpty: function () {
+                Swal.fire({ type: 'error', title: 'PDF', text: 'No se recibió el PDF.' });
               },
-              error: function () { Swal.fire({ type: 'error', title: 'PDF', text: 'Error al generar/abrir el PDF.' }); }
+              onError: function () {
+                Swal.fire({ type: 'error', title: 'PDF', text: 'Error al generar/abrir el PDF.' });
+              }
             });
           }
 
