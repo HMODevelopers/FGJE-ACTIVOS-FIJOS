@@ -22,7 +22,8 @@ namespace ActivosFijos.Controllers
 
             if (rm.response)
             {
-                rm.href = "/Home/Index";
+                var requiereCambio = rm.result is bool && (bool)rm.result;
+                rm.href = requiereCambio ? Url.Action("CambiarPassword", "Usuarios", new { returnUrl = "/Home/Index" }) : "/Home/Index";
             }
 
             return Json(rm);

@@ -66,6 +66,14 @@
                     <td>
                         <center>
                             <a href="@Url.Action("Editar", new { id = item.IdUsuario })" class="btn btn-primary"><i class="icon-pencil"></i></a>
+                            @using (Html.BeginForm("RestablecerPassword", "Usuarios", FormMethod.Post, new { @class = "d-inline" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                @Html.Hidden("id", item.IdUsuario)
+                                <button type="submit" data-ajax="true" data-confirm="¿Desea restablecer la contraseña de este usuario?" class="btn btn-warning">
+                                    <i class="mdi mdi-refresh"></i>
+                                </button>
+                            }
                         </center>
                     </td>
                 </tr>
@@ -102,4 +110,3 @@ else
 {
     <p>No se encontraron resultados.</p>
 }
-

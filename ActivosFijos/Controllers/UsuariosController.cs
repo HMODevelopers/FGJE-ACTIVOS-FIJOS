@@ -1,11 +1,11 @@
 ﻿using ActivosFijos.Models;
 using Helpers;
-using Org.BouncyCastle.Asn1.Ocsp;
 using System.Collections.Generic;
 using System;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using ActivosFijos.Models.ViewModels;
 using static EDUES_ADMIN.Filters.AdminFilters;
 
 
@@ -61,6 +61,7 @@ namespace ActivosFijos.Controllers
                 {
                     usuario.Pass = HashHelper.SHA256(usuario.Pass);
                     usuario.Activo = true;
+                    usuario.ForcePasswordChange = false;
                     usuario.FechaCreacion = DateTime.Now;
                     rm = UsuariosB.Add(usuario);
 
@@ -110,6 +111,85 @@ namespace ActivosFijos.Controllers
             var usuario = _db.PLU_CONF_Usuario.Where(x => x.IdUsuario == idUsuario).FirstOrDefault();
             
             return View("Perfil",usuario);
+        }
+
+        public ActionResult CambiarPassword(string returnUrl = "")
+        {
+            var model = new ChangePasswordViewModel
+            {
+                ReturnUrl = returnUrl
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public JsonResult CambiarPassword(ChangePasswordViewModel model)
+        {
+            var rm = new ResponseModel();
+
+            if (!ModelState.IsValid)
+            {
+                rm.message = "Modelo no válido, verifique los datos ingresados.";
+                rm.error = true;
+                return Json(rm);
+            }
+
+            int idUsuario = SessionHelper.GetUser();
+            var usuario = _db.PLU_CONF_Usuario.FirstOrDefault(x => x.IdUsuario == idUsuario);
+
+            if (usuario == null)
+            {
+                rm.message = "No se encontró el usuario en sesión.";
+                rm.error = true;
+                return Json(rm);
+            }
+
+            var currentHash = HashHelper.SHA256(model.CurrentPassword);
+
+            if (!string.Equals(usuario.Pass, currentHash, StringComparison.OrdinalIgnoreCase))
+            {
+                rm.message = "La contraseña actual es incorrecta.";
+                rm.error = true;
+                return Json(rm);
+            }
+
+            usuario.Pass = HashHelper.SHA256(model.NewPassword);
+            usuario.ForcePasswordChange = false;
+            _db.SaveChanges();
+
+            rm.SetResponse(true);
+            rm.message = "Contraseña actualizada correctamente.";
+            rm.href = string.IsNullOrWhiteSpace(model.ReturnUrl) ? Url.Action("Perfil", "Usuarios") : model.ReturnUrl;
+            rm.error = false;
+
+            return Json(rm);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public JsonResult RestablecerPassword(int id)
+        {
+            var rm = new ResponseModel();
+
+            var usuario = _db.PLU_CONF_Usuario.FirstOrDefault(x => x.IdUsuario == id);
+            if (usuario == null)
+            {
+                rm.message = "Usuario no encontrado.";
+                rm.error = true;
+                return Json(rm);
+            }
+
+            usuario.Pass = HashHelper.SHA256("123456789$");
+            usuario.ForcePasswordChange = true;
+            _db.SaveChanges();
+
+            rm.SetResponse(true);
+            rm.message = "Contraseña restablecida correctamente.";
+            rm.error = false;
+
+            return Json(rm);
         }
 
 

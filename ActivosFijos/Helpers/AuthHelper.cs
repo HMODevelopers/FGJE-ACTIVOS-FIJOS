@@ -26,6 +26,7 @@ namespace Helpers
                     if (usuario != null)
                     {
                         SessionHelper.AddUserToSession(usuario.IdUsuario.ToString());
+                        rm.result = usuario.ForcePasswordChange;
                         rm.SetResponse(true);
                     }
                     else
