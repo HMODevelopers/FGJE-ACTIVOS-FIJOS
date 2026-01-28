@@ -1,36 +1,32 @@
-﻿@model PagedList.IPagedList<ActivosFijos.Models.PLU_CAT_Proveedores>
+﻿@model PagedList.IPagedList<ActivosFijos.Models.PLU_CAT_Clasificadores>
 
 @if (Model.Count > 0)
 {
-
     <div class="row">
         <div class="col-md-12">
-            @Html.Raw($"<a type='button' href='{Url.Action("Agregar")}' class='btn btn-success waves-effect waves-light'><i class='icon-plus mr-1'></i> Agregar Proveedor</a>")
+            <button class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#con-close-modal"><span><i class="la la-add"></i></span>Agregar Clasificadores</button>
         </div>
     </div>
     <br />
     <table class="table table-bordered">
         <tr>
             <th>
-                @Ajax.ActionLink("#", "Index", new { sOrder = ViewBag.IdProveedorSortParam, NombreProveedor = ViewBag.NombreProveedor, iPerPage = ViewBag.PerPage, iPagina = 1 }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                @Ajax.ActionLink("#", "Index", new { sOrder = ViewBag.IdClasificadorSortParam, Clasificador = ViewBag.Clasificador, iPerPage = ViewBag.PerPage, iPagina = 1 }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
                 <i class="mdi mdi-sort"></i>
             </th>
             <th>
-                @Ajax.ActionLink("Nombre Proveedor", "Index", new { sOrder = ViewBag.NombreProveedorSortParam, NombreProveedor = ViewBag.NombreProveedor, iPerPage = ViewBag.PerPage, iPagina = 1 }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                @Ajax.ActionLink("Nombre Clasificador", "Index", new { sOrder = ViewBag.NombreClasificadorSortParam, Clasificador = ViewBag.Clasificador, iPerPage = ViewBag.PerPage, iPagina = 1 }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
                 <i class="mdi mdi-sort"></i>
             </th>
-            <th>RFC</th>
-            <th>Estatus</th>
+            <th>Activo</th>
             <th>Fecha Creación</th>
-            <th><label></label>Acciones</th>
         </tr>
 
         @foreach (var item in Model)
         {
             <tr>
-                <td>@Html.DisplayFor(modelItem => item.IdProveedor)</td>
-                <td><strong>@Html.DisplayFor(modelItem => item.RazonSocial)</strong></td>
-                <td><strong>@Html.DisplayFor(modelItem => item.Rfc)</strong></td>
+                <td>@Html.DisplayFor(modelItem => item.IdClasificadores)</td>
+                <td><strong>@Html.DisplayFor(modelItem => item.ClasificadorDescripcion)</strong></td>
                 <td class="text-center">
                     @{
                         string sColor = "";
@@ -47,16 +43,9 @@
                     <i class="mdi mdi-checkbox-blank-circle @sColor"></i>
                 </td>
                 <td>@Html.DisplayFor(modelItem => item.FechaCreacion)</td>
-                <td>
-                    <center>
-                        <a href="@Url.Action("Editar", new { id = item.IdProveedor })" class="btn btn-primary"><i class="icon-pencil"></i></a>
-
-                    </center>
-                </td>
             </tr>
         }
     </table>
-
 
     <div class="container-fluid">
         <div class="row mt-3">
@@ -66,7 +55,7 @@
             </div>
             <div class="col-12 text-right">
                 <div id="pagedList" class="pagedList" data-otf-target="#IndexList">
-                    @Html.PagedListPager(Model, iPagina => Url.Action("Index", new { iPagina, iPerPage = ViewBag.PerPage, sOrder = ViewBag.Order, NombreProveedor = ViewBag.NombreProveedor }), PagedList.Mvc.PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(PagedListRenderOptions.ClassicPlusFirstAndLast,
+                    @Html.PagedListPager(Model, iPagina => Url.Action("Index", new { iPagina, iPerPage = ViewBag.PerPage, sOrder = ViewBag.Order, Clasificador = ViewBag.Clasificador }), PagedList.Mvc.PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(PagedListRenderOptions.ClassicPlusFirstAndLast,
                           new AjaxOptions
                                {
                               HttpMethod = "get",
@@ -80,8 +69,6 @@
 
         </div>
     </div>
-
-
 }
 else
 {

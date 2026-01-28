@@ -20,6 +20,7 @@ namespace ActivosFijos.Controllers
             ViewBag.Order = sOrder;
             ViewBag.PerPage = iPerPage;
             ViewBag.Pagina = iPagina;
+            ViewBag.NombreProveedor = NombreProveedor;
 
             ViewBag.IdProveedorSortParam = sOrder == "#" ? "#_desc" : "#";
             ViewBag.NombreProveedorSortParam = sOrder == "NombreProveedor" ? "NombreProveedor_desc" : "NombreProveedor";

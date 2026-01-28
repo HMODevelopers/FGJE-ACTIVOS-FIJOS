@@ -19,6 +19,7 @@ namespace ActivosFijos.Controllers
             ViewBag.Order = sOrder;
             ViewBag.PerPage = iPerPage;
             ViewBag.Pagina = iPagina;
+            ViewBag.Almacen = Almacen;
 
             ViewBag.IdAlmacenSortParam = sOrder == "#" ? "#_desc" : "#";
             ViewBag.NombreAlmacenSortParam = sOrder == "NombreAlmacen" ? "NombreAlmacen_desc" : "NombreAlmacen";

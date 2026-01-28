@@ -21,6 +21,7 @@ namespace ActivosFijos.Controllers
             ViewBag.Order = sOrder;
             ViewBag.PerPage = iPerPage;
             ViewBag.Pagina = iPagina;
+            ViewBag.EstatusActivo = EstatusActivo;
 
             ViewBag.IdEstatusActivoSortParam = sOrder == "#" ? "#_desc" : "#";
             ViewBag.NombreEstatusActivoSortParam = sOrder == "NombreEstatusA" ? "NombreEstatusA_desc" : "NombreEstatusA";

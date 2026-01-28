@@ -20,6 +20,7 @@ namespace ActivosFijos.Controllers
             ViewBag.Order = sOrder;
             ViewBag.PerPage = iPerPage;
             ViewBag.Pagina = iPagina;
+            ViewBag.EstadoFisico = EstadoFisico;
 
             ViewBag.IdEstadoFSortParam = sOrder == "#" ? "#_desc" : "#";
             ViewBag.NombreEstadoFSortParam = sOrder == "NombreEstadoF" ? "NombreEstadoF_desc" : "NombreEstadoF";
