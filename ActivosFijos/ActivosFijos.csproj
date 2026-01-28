@@ -198,6 +198,10 @@
     <Compile Include="Controllers\EmpleadosController.cs" />
     <Compile Include="Controllers\EstadoFisicoController.cs" />
     <Compile Include="Controllers\EstatusActivoController.cs" />
+    <Compile Include="Services\Pdf\EmpleadosPdfBuilder.cs" />
+    <Compile Include="Services\Pdf\InventarioPdfBuilder.cs" />
+    <Compile Include="Services\Pdf\PdfCommonBuilder.cs" />
+    <Compile Include="Services\Pdf\ResguardosPdfBuilder.cs" />
     <Compile Include="Controllers\FacturasController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\InventarioController.cs" />
@@ -382,6 +386,7 @@
     <Content Include="Content\assets\js\lightbox.js" />
     <Content Include="Content\assets\js\lightbox.min.js" />
     <Content Include="Content\assets\js\Loader.js" />
+    <Content Include="Content\assets\js\pdf-helper.js" />
     <Content Include="Content\assets\js\pages\apexcharts.init.js" />
     <Content Include="Content\assets\js\pages\britechart.init.js" />
     <Content Include="Content\assets\js\pages\calendar.init.js" />

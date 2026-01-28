@@ -179,31 +179,7 @@
 
              //var activosJson = JSON.stringify(activos);
 
-                 // Realizar una solicitud al controlador para generar el PDF
-                 $.ajax({
-                     url: '@Url.Action("GenerarPdf", "Inventario")', // Reemplazar con la ruta correcta
-                     type: "POST",
-                     data: { NumeroEmpleado: NumeroEmpleado },
-                     success: function (pdfData) {
-                         // Crear un objeto Blob con el PDF en formato Base64
-                         var byteCharacters = atob(pdfData.PdfBase64);
-                         var byteNumbers = new Array(byteCharacters.length);
-                         for (var i = 0; i < byteCharacters.length; i++) {
-                             byteNumbers[i] = byteCharacters.charCodeAt(i);
-                         }
-                         var byteArray = new Uint8Array(byteNumbers);
-                         var blob = new Blob([byteArray], { type: 'application/pdf' });
-
-                         // Crear un objeto URL a partir del Blob
-                         var url = URL.createObjectURL(blob);
-
-                         // Abrir una nueva pestaña con el PDF
-                         window.open(url, '_blank');
-                     },
-                     error: function (error) {
-                         console.error("Error al generar o abrir el PDF." + error);
-                     }
-                 });
+                 openPdfFromUrl('@Url.Action("GenerarPdf", "Inventario")', { NumeroEmpleado: NumeroEmpleado });
          }
     </script>
 }

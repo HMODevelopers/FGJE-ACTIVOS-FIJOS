@@ -71,39 +71,13 @@
         }
 
         function GenerarPdf(Activos, NumeroEmpleado, FechaCreacion) {
-
-           
-
             var fechaISO = convertirFechaDotNet(FechaCreacion);
 
-            $.ajax({
-                url: '@Url.Action("GenerarPdf", "Resguardos")',
-                type: "POST",
-                data: {
-                    activos: Activos,
-                    NumeroEmpleado: NumeroEmpleado,
-                    TipoMovimiento: 1,
-                    FechaCreacion: fechaISO
-                },
-                success: function (pdfData) {
-                    // Crear un objeto Blob con el PDF en formato Base64
-                    var byteCharacters = atob(pdfData.PdfBase64);
-                    var byteNumbers = new Array(byteCharacters.length);
-                    for (var i = 0; i < byteCharacters.length; i++) {
-                        byteNumbers[i] = byteCharacters.charCodeAt(i);
-                    }
-                    var byteArray = new Uint8Array(byteNumbers);
-                    var blob = new Blob([byteArray], { type: 'application/pdf' });
-
-                    // Crear un objeto URL a partir del Blob
-                    var url = URL.createObjectURL(blob);
-
-                    // Abrir una nueva pestaña con el PDF
-                    window.open(url, '_blank');
-                },
-                error: function (error) {
-                    console.error("Error al generar o abrir el PDF." + error);
-                }
+            openPdfFromUrl('@Url.Action("GenerarPdf", "Resguardos")', {
+                activos: Activos,
+                NumeroEmpleado: NumeroEmpleado,
+                TipoMovimiento: 1,
+                FechaCreacion: fechaISO
             });
         }
 
@@ -118,5 +92,4 @@
     </script>
 
 }
-
 
