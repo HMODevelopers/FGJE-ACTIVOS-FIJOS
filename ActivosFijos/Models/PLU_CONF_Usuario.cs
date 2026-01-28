@@ -35,6 +35,9 @@ namespace ActivosFijos.Models
         [DisplayName("Password")]
         public string Pass { get; set; }
 
+        [DisplayName("Requiere cambio de contraseña")]
+        public bool ForcePasswordChange { get; set; }
+
         [Required]
         [StringLength(100)]
         [DisplayName("Nombres")]

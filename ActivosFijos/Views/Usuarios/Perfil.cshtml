@@ -12,7 +12,7 @@
             <h4 class="mb-0">@Html.DisplayFor(x => x.Nombres)</h4>
             <p class="text-muted">@Html.DisplayFor(x => x.Username)</p>
 
-            <a href="#" data-toggle="modal" data-target="#event-modal" class="btn btn-success"><i class="mdi mdi-plus-circle-outline"></i> Cambiar Contraseña</a>
+            <a href="@Url.Action("CambiarPassword", "Usuarios")" class="btn btn-success"><i class="mdi mdi-plus-circle-outline"></i> Cambiar Contraseña</a>
 
             <div class="text-left mt-3">
 
@@ -27,24 +27,3 @@
         </div> <!-- end card-box -->
     </div>
 </div>
-
-
-<!-- Add New Event MODAL -->
-<div class="modal fade" id="event-modal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Add New Event</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            </div>
-            <div class="modal-body p-3">
-            </div>
-            <div class="text-right p-3">
-                <button type="button" class="btn btn-light " data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-success save-event  ">Create event</button>
-                <button type="button" class="btn btn-danger delete-event  " data-dismiss="modal">Delete</button>
-            </div>
-        </div> <!-- end modal-content-->
-    </div> <!-- end modal dialog-->
-</div>
-<!-- end modal-->
