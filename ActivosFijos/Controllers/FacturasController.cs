@@ -21,6 +21,7 @@ namespace ActivosFijos.Controllers
             ViewBag.Order = sOrder;
             ViewBag.PerPage = iPerPage;
             ViewBag.Pagina = iPagina;
+            ViewBag.FolioFactura = FolioFactura;
 
             ViewBag.IdFacturaSortParam = sOrder == "#" ? "#_desc" : "#";
             ViewBag.FolioFacturaSortParam = sOrder == "FolioFactura" ? "FolioFactura_desc" : "FolioFactura";

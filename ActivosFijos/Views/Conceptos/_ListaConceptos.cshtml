@@ -12,11 +12,11 @@
     <table class="table table-bordered">
         <tr>
             <th>
-                @Ajax.ActionLink("#", "Index", new { sOrder = ViewBag.IdConceptoSortParam, }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                @Ajax.ActionLink("#", "Index", new { sOrder = ViewBag.IdConceptoSortParam, Conceptos = ViewBag.Conceptos, iPerPage = ViewBag.PerPage, iPagina = 1 }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
                 <i class="mdi mdi-sort"></i>
             </th>
             <th>
-                @Ajax.ActionLink("Nombre Concepto", "Index", new { sOrder = ViewBag.NombreConceptoSortParam, }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                @Ajax.ActionLink("Nombre Concepto", "Index", new { sOrder = ViewBag.NombreConceptoSortParam, Conceptos = ViewBag.Conceptos, iPerPage = ViewBag.PerPage, iPagina = 1 }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
                 <i class="mdi mdi-sort"></i>
             </th>
             <th>Capitulo</th>
@@ -68,7 +68,7 @@
             </div>
             <div class="col-sm-4 col-12 text-right">
                 <div id="pagedList" class="pagedList" data-otf-target="#IndexList">
-                    @Html.PagedListPager(Model, iPagina => Url.Action("Index", new { iPagina, iPerPage = ViewBag.PerPage, sOrder = ViewBag.Order, }), PagedList.Mvc.PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(PagedListRenderOptions.ClassicPlusFirstAndLast,
+                    @Html.PagedListPager(Model, iPagina => Url.Action("Index", new { iPagina, iPerPage = ViewBag.PerPage, sOrder = ViewBag.Order, Conceptos = ViewBag.Conceptos }), PagedList.Mvc.PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(PagedListRenderOptions.ClassicPlusFirstAndLast,
                           new AjaxOptions
                                {
                               HttpMethod = "get",

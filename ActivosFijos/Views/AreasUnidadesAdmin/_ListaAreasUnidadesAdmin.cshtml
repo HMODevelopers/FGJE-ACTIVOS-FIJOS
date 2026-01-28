@@ -1,0 +1,81 @@
+﻿@model PagedList.IPagedList<ActivosFijos.Models.PLU_CAT_AreasUnidadesAdministrativas>
+
+@if (Model.Count > 0)
+{
+    <div class="row">
+        <div class="col-md-12">
+            <button class="btn btn-primary waves-effect waves-light" data-toggle="modal" data-target="#con-close-modal"><span><i class="la la-add"></i></span>Agregar Area</button>
+        </div>
+    </div>
+    <br />
+    <table class="table table-bordered">
+        <tr>
+            <th>
+                @Ajax.ActionLink("#", "Index", new { sOrder = ViewBag.IdAreaSortParam, UnidadAdministrativa = ViewBag.UnidadAdministrativa, NombreArea = ViewBag.NombreArea, iPerPage = ViewBag.PerPage, iPagina = 1 }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                <i class="mdi mdi-sort"></i>
+            </th>
+            <th>
+                @Ajax.ActionLink("Nombre Unidad Administrativa", "Index", new { sOrder = ViewBag.UnidadAdministrativaSortParam, UnidadAdministrativa = ViewBag.UnidadAdministrativa, NombreArea = ViewBag.NombreArea, iPerPage = ViewBag.PerPage, iPagina = 1 }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                <i class="mdi mdi-sort"></i>
+            </th>
+            <th>
+                @Ajax.ActionLink("Nombre Area", "Index", new { sOrder = ViewBag.NombreAreaSortParam, UnidadAdministrativa = ViewBag.UnidadAdministrativa, NombreArea = ViewBag.NombreArea, iPerPage = ViewBag.PerPage, iPagina = 1 }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                <i class="mdi mdi-sort"></i>
+            </th>
+            <th>Activo</th>
+            <th>Fecha Creación</th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.IdAreaUnidadAdministrativa)</td>
+                <td><strong>@(item.PLU_CAT_UnidadesAdministrativas?.UnidadAdministrativa ?? string.Empty)</strong></td>
+                <td>@Html.DisplayFor(modelItem => item.NombreArea)</td>
+                <td class="text-center">
+                    @{
+                        string sColor = "";
+                        if (item.Activo == false)
+                        {
+                            sColor = "text-danger";
+                        }
+                        else if (item.Activo == true)
+                        {
+                            sColor = "text-success";
+                        }
+                    }
+
+                    <i class="mdi mdi-checkbox-blank-circle @sColor"></i>
+                </td>
+                <td>@Html.DisplayFor(modelItem => item.FechaCreacion)</td>
+            </tr>
+        }
+    </table>
+
+    <div class="container-fluid">
+        <div class="row mt-3">
+
+            <div class="col-sm-8 col-12">
+                <span>Activos del <strong>@(Model.LastItemOnPage > 0 ? Model.FirstItemOnPage : 0)</strong> al  <strong>@Model.LastItemOnPage</strong> de <strong>@Model.TotalItemCount</strong> Registros</span>
+            </div>
+            <div class="col-12 text-right">
+                <div id="pagedList" class="pagedList" data-otf-target="#IndexList">
+                    @Html.PagedListPager(Model, iPagina => Url.Action("Index", new { iPagina, iPerPage = ViewBag.PerPage, sOrder = ViewBag.Order, UnidadAdministrativa = ViewBag.UnidadAdministrativa, NombreArea = ViewBag.NombreArea }), PagedList.Mvc.PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(PagedListRenderOptions.ClassicPlusFirstAndLast,
+                          new AjaxOptions
+                               {
+                              HttpMethod = "get",
+                              InsertionMode = InsertionMode.Replace,
+                              UpdateTargetId = "resultadosBusqueda",
+                              OnBegin = "ShowLoading",
+                              OnComplete = "HideLoading"
+                          }))
+                </div>
+            </div>
+
+        </div>
+    </div>
+}
+else
+{
+    <p>No se encontraron resultados.</p>
+}
