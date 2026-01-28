@@ -1,7 +1,9 @@
 ﻿using ActivosFijos.Helpers;
 using ActivosFijos.Models;
 using Helpers;
+using PagedList;
 using System;
+using System.Data.Entity;
 using System.Linq;
 using System.Web.Mvc;
 using static EDUES_ADMIN.Filters.AdminFilters;
@@ -16,17 +18,82 @@ namespace ActivosFijos.Controllers
         FacturaHelper FacturaB = new FacturaHelper();
 
         // GET: EstadoFisico
-        public ActionResult Index(string sOrder = "", string FolioFactura = "", int iPagina = 1, int iPerPage = 10)
+        public ActionResult Index(string sOrder = "", string FolioFactura = "", int? IdProveedor = null, int? IdRecurso = null, DateTime? FechaDesde = null, DateTime? FechaHasta = null, int iPagina = 1, int iPerPage = 10)
         {
+            if (IdProveedor.HasValue && IdProveedor.Value <= 0)
+            {
+                IdProveedor = null;
+            }
+
+            if (IdRecurso.HasValue && IdRecurso.Value <= 0)
+            {
+                IdRecurso = null;
+            }
+
             ViewBag.Order = sOrder;
             ViewBag.PerPage = iPerPage;
             ViewBag.Pagina = iPagina;
             ViewBag.FolioFactura = FolioFactura;
+            ViewBag.IdProveedor = IdProveedor;
+            ViewBag.IdRecurso = IdRecurso;
+            ViewBag.FechaDesde = FechaDesde;
+            ViewBag.FechaHasta = FechaHasta;
 
             ViewBag.IdFacturaSortParam = sOrder == "#" ? "#_desc" : "#";
             ViewBag.FolioFacturaSortParam = sOrder == "FolioFactura" ? "FolioFactura_desc" : "FolioFactura";
 
-            var vModel = FacturaB.GetAll(sOrder, FolioFactura, iPagina, iPerPage);
+            CargarCatalogos(IdProveedor, IdRecurso);
+
+            var vModelQuery = _db.PLU_CAT_Facturas
+                .Include(f => f.PLU_CAT_Proveedores)
+                .Include(f => f.PLU_CAT_Recursos)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(FolioFactura))
+            {
+                vModelQuery = vModelQuery.Where(r => r.FolioFactura.Contains(FolioFactura));
+            }
+
+            if (IdProveedor.HasValue && IdProveedor.Value > 0)
+            {
+                vModelQuery = vModelQuery.Where(r => r.IdProveedor == IdProveedor.Value);
+            }
+
+            if (IdRecurso.HasValue && IdRecurso.Value > 0)
+            {
+                vModelQuery = vModelQuery.Where(r => r.IdRecurso == IdRecurso.Value);
+            }
+
+            if (FechaDesde.HasValue)
+            {
+                vModelQuery = vModelQuery.Where(r => DbFunctions.TruncateTime(r.FechaFactura) >= FechaDesde.Value.Date);
+            }
+
+            if (FechaHasta.HasValue)
+            {
+                vModelQuery = vModelQuery.Where(r => DbFunctions.TruncateTime(r.FechaFactura) <= FechaHasta.Value.Date);
+            }
+
+            switch (sOrder)
+            {
+                case "#":
+                    vModelQuery = vModelQuery.OrderByDescending(r => r.Activo).ThenBy(r => r.IdFactura);
+                    break;
+                case "#_desc":
+                    vModelQuery = vModelQuery.OrderByDescending(r => r.Activo).ThenByDescending(r => r.IdFactura);
+                    break;
+                case "FolioFactura":
+                    vModelQuery = vModelQuery.OrderByDescending(r => r.Activo).ThenBy(r => r.FolioFactura);
+                    break;
+                case "FolioFactura_desc":
+                    vModelQuery = vModelQuery.OrderByDescending(r => r.Activo).ThenByDescending(r => r.FolioFactura);
+                    break;
+                default:
+                    vModelQuery = vModelQuery.OrderByDescending(r => r.Activo).ThenBy(r => r.IdFactura);
+                    break;
+            }
+
+            var vModel = vModelQuery.ToPagedList(iPagina, iPerPage);
 
             if (Request.IsAjaxRequest())
             {
@@ -102,14 +169,14 @@ namespace ActivosFijos.Controllers
         }
 
 
-        public void CargarCatalogos()
+        public void CargarCatalogos(int? proveedorId = null, int? recursoId = null)
         {
             
             var proveedor = _db.PLU_CAT_Proveedores.Where(x => x.Activo == true).OrderBy(x => x.RazonSocial).ToList();
-            ViewBag.Proveedores = new SelectList(proveedor, "IdProveedor", "RazonSocial");
+            ViewBag.Proveedores = new SelectList(proveedor, "IdProveedor", "RazonSocial", proveedorId);
 
             var Recursos = _db.PLU_CAT_Recurso.Where(x => x.Activo == true).OrderBy(x => x.NombreRecurso).ToList();
-            ViewBag.Recursos = new SelectList(Recursos, "IdRecurso", "NombreRecurso");
+            ViewBag.Recursos = new SelectList(Recursos, "IdRecurso", "NombreRecurso", recursoId);
 
         }
     }

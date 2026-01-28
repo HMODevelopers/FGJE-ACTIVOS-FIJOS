@@ -1,4 +1,13 @@
 ﻿@model PagedList.IPagedList<ActivosFijos.Models.PLU_CAT_Facturas>
+@using PagedList.Mvc;
+
+@{
+    string folioFactura = ViewBag.FolioFactura as string;
+    string fechaDesdeS = ViewBag.FechaDesde != null ? ((DateTime)ViewBag.FechaDesde).ToString("yyyy-MM-dd") : null;
+    string fechaHastaS = ViewBag.FechaHasta != null ? ((DateTime)ViewBag.FechaHasta).ToString("yyyy-MM-dd") : null;
+    int? idProveedor = ViewBag.IdProveedor as int?;
+    int? idRecurso = ViewBag.IdRecurso as int?;
+}
 
 <div class="row">
     <div class="col-md-12">
@@ -13,11 +22,11 @@
     <table class="table table-bordered">
         <tr>
             <th>
-                @Ajax.ActionLink("#", "Index", new { sOrder = ViewBag.IdFacturaSortParam, FolioFactura = ViewBag.FolioFactura, iPerPage = ViewBag.PerPage, iPagina = 1 }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                @Ajax.ActionLink("#", "Index", new { sOrder = ViewBag.IdFacturaSortParam, FolioFactura = folioFactura, IdProveedor = idProveedor, IdRecurso = idRecurso, FechaDesde = fechaDesdeS, FechaHasta = fechaHastaS, iPerPage = ViewBag.PerPage, iPagina = 1 }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
                 <i class="mdi mdi-sort"></i>
             </th>
             <th>
-                @Ajax.ActionLink("Folio Factura", "Index", new { sOrder = ViewBag.FolioFacturaSortParam, FolioFactura = ViewBag.FolioFactura, iPerPage = ViewBag.PerPage, iPagina = 1 }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                @Ajax.ActionLink("Folio Factura", "Index", new { sOrder = ViewBag.FolioFacturaSortParam, FolioFactura = folioFactura, IdProveedor = idProveedor, IdRecurso = idRecurso, FechaDesde = fechaDesdeS, FechaHasta = fechaHastaS, iPerPage = ViewBag.PerPage, iPagina = 1 }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
                 <i class="mdi mdi-sort"></i>
             </th>
             <th>Proveedor</th>
@@ -71,7 +80,7 @@
             </div>
             <div class="col-12 text-right">
                 <div id="pagedList" class="pagedList" data-otf-target="#IndexList">
-                    @Html.PagedListPager(Model, iPagina => Url.Action("Index", new { iPagina, iPerPage = ViewBag.PerPage, sOrder = ViewBag.Order, FolioFactura = ViewBag.FolioFactura }), PagedList.Mvc.PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(PagedListRenderOptions.ClassicPlusFirstAndLast,
+                    @Html.PagedListPager(Model, iPagina => Url.Action("Index", new { iPagina, iPerPage = ViewBag.PerPage, sOrder = ViewBag.Order, FolioFactura = folioFactura, IdProveedor = idProveedor, IdRecurso = idRecurso, FechaDesde = fechaDesdeS, FechaHasta = fechaHastaS }), PagedList.Mvc.PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(PagedListRenderOptions.ClassicPlusFirstAndLast,
                           new AjaxOptions
                                {
                               HttpMethod = "get",
