@@ -198,6 +198,8 @@
     <Compile Include="Controllers\EmpleadosController.cs" />
     <Compile Include="Controllers\EstadoFisicoController.cs" />
     <Compile Include="Controllers\EstatusActivoController.cs" />
+    <Compile Include="Helpers\AreasUnidadesAdminHelper.cs" />
+    <Compile Include="Helpers\ClasificadoresHelper.cs" />
     <Compile Include="Services\Pdf\EmpleadosPdfBuilder.cs" />
     <Compile Include="Services\Pdf\InventarioPdfBuilder.cs" />
     <Compile Include="Services\Pdf\PdfCommonBuilder.cs" />
@@ -755,6 +757,10 @@
     <Content Include="Views\Activos\_FiltrosBajas.cshtml" />
     <Content Include="Views\Activos\DetallesBajas.cshtml" />
     <Content Include="Views\Reportes\ActividadUsuarios.cshtml" />
+    <Content Include="Views\AreasUnidadesAdmin\_Filtros.cshtml" />
+    <Content Include="Views\AreasUnidadesAdmin\_ListaAreasUnidadesAdmin.cshtml" />
+    <Content Include="Views\Clasificadores\_Filtros.cshtml" />
+    <Content Include="Views\Clasificadores\_ListaClasificadores.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

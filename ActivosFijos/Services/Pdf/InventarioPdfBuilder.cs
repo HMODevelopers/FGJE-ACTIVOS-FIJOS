@@ -41,7 +41,7 @@ namespace ActivosFijos.Services.Pdf
                     bienesTable.AddCell(new PdfPCell(new Phrase("Resguardo", FontFactory.GetFont(FontFactory.HELVETICA, 6))) { HorizontalAlignment = Element.ALIGN_CENTER });
                 }
 
-                bienesTable.AddCell(new PdfPCell(new Phrase(activo.FechaCaptura?.ToString("dd/MM/yyyy"), FontFactory.GetFont(FontFactory.HELVETICA, 6))) { HorizontalAlignment = Element.ALIGN_CENTER });
+                bienesTable.AddCell(new PdfPCell(new Phrase(activo.FechaCreacion.ToString("dd/MM/yyyy"), FontFactory.GetFont(FontFactory.HELVETICA, 6))) { HorizontalAlignment = Element.ALIGN_CENTER });
             }
 
             AddEmptyRows(bienesTable, activos.Count);
@@ -82,7 +82,7 @@ namespace ActivosFijos.Services.Pdf
                     bienesTable.AddCell(new PdfPCell(new Phrase("Resguardo", FontFactory.GetFont(FontFactory.HELVETICA, 6))) { HorizontalAlignment = Element.ALIGN_CENTER });
                 }
 
-                bienesTable.AddCell(new PdfPCell(new Phrase(activo.FechaCaptura?.ToString("dd/MM/yyyy"), FontFactory.GetFont(FontFactory.HELVETICA, 6))) { HorizontalAlignment = Element.ALIGN_CENTER });
+                bienesTable.AddCell(new PdfPCell(new Phrase(activo.FechaCreacion.ToString("dd/MM/yyyy"), FontFactory.GetFont(FontFactory.HELVETICA, 6))) { HorizontalAlignment = Element.ALIGN_CENTER });
             }
 
             AddEmptyRows(bienesTable, activos.Count);
