@@ -1,17 +1,19 @@
-﻿<div class="card-header" style="border-color:darkgray; border-style:dotted;">
+﻿@{
+    var activoSeleccionado = ViewBag.Activo != null ? ViewBag.Activo.ToString().ToLower() : string.Empty;
+}
+<div class="card-header" style="border-color:darkgray; border-style:dotted;">
     <h5>Filtros</h5>
 
     <div class="row">
         <div class="col-lg-12">
             @using (Ajax.BeginForm("ListarCambios", "Resguardos", new AjaxOptions { HttpMethod = "GET", UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" }))
             {
-                <input type="hidden" name="numemp" id="numempfiltros" value="@ViewBag.NumEmp" />
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="field-1" class="control-label">Nombre Completo Resguardante</label>
+                            <label for="field-1" class="control-label">Folio de Cambio</label>
                             <div class="input-group">
-                                @Html.TextBox("NombreResguardante", null, new { @class = "form-control filtrar" })
+                                @Html.TextBox("FolioCambio", (string)ViewBag.FolioCambio, new { @class = "form-control filtrar" })
                                 <div class="input-group-append clean-filter">
                                     <span class="input-group-text">
                                         <i class="mdi mdi-close-circle text-danger"></i>
@@ -23,15 +25,155 @@
 
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="field-1" class="control-label">Fecha Alta</label>
+                            <label for="field-1" class="control-label">Número Inventario</label>
                             <div class="input-group">
-                                @Html.TextBox("FechaAlta", null, new { @class = "form-control filtrar", @type = "Date" })
+                                @Html.TextBox("NumeroInventario", (string)ViewBag.NumeroInventario, new { @class = "form-control filtrar" })
                                 <div class="input-group-append clean-filter">
                                     <span class="input-group-text">
                                         <i class="mdi mdi-close-circle text-danger"></i>
                                     </span>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="control-label">Descripción</label>
+                            <div class="input-group">
+                                @Html.TextBox("Descripcion", (string)ViewBag.Descripcion, new { @class = "form-control filtrar" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="control-label">Número Serie</label>
+                            <div class="input-group">
+                                @Html.TextBox("NumeroSerie", (string)ViewBag.NumeroSerie, new { @class = "form-control filtrar" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="control-label">Folio Oficio</label>
+                            <div class="input-group">
+                                @Html.TextBox("FolioOficio", (string)ViewBag.FolioOficio, new { @class = "form-control filtrar" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="control-label">No. Empleado Anterior</label>
+                            <div class="input-group">
+                                @Html.TextBox("NumeroEmpleadoAnterior", (string)ViewBag.NumeroEmpleadoAnterior, new { @class = "form-control filtrar" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="control-label">Empleado Anterior</label>
+                            <div class="input-group">
+                                @Html.TextBox("EmpleadoAnterior", (string)ViewBag.EmpleadoAnterior, new { @class = "form-control filtrar" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="control-label">No. Empleado Actual</label>
+                            <div class="input-group">
+                                @Html.TextBox("NumeroEmpleadoActual", (string)ViewBag.NumeroEmpleadoActual, new { @class = "form-control filtrar" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="control-label">Empleado Actual</label>
+                            <div class="input-group">
+                                @Html.TextBox("EmpleadoActual", (string)ViewBag.EmpleadoActual, new { @class = "form-control filtrar" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="control-label">Fecha Inicio</label>
+                            <div class="input-group">
+                                @Html.TextBox("FechaInicio", (string)ViewBag.FechaInicio, new { @class = "form-control filtrar", @type = "date" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="control-label">Fecha Fin</label>
+                            <div class="input-group">
+                                @Html.TextBox("FechaFin", (string)ViewBag.FechaFin, new { @class = "form-control filtrar", @type = "date" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="control-label">Estatus</label>
+                            @Html.DropDownList(
+                                "Activo",
+                                new List<SelectListItem>
+                                {
+                                    new SelectListItem{ Text = "Todos", Value = "", Selected = string.IsNullOrEmpty(activoSeleccionado) },
+                                    new SelectListItem{ Text = "Activos", Value = "true", Selected = activoSeleccionado == "true" },
+                                    new SelectListItem{ Text = "Inactivos", Value = "false", Selected = activoSeleccionado == "false" }
+                                },
+                                new { @class = "form-control filtrar" })
                         </div>
                     </div>
                 </div>

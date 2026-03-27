@@ -15,8 +15,26 @@
                         <i class="mdi mdi-sort"></i>
                     </th>
                     <th>
-                        @Ajax.ActionLink("Empleado Resguardante", "ListarCambios", new { Orden = ViewBag.NombreResguardanteSortParam }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
+                        @Ajax.ActionLink("Empleado Actual", "ListarCambios", new { Orden = ViewBag.NombreResguardanteSortParam }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
                         <i class="mdi mdi-sort"></i>
+                    </th>
+                    <th>
+                        Número Empleado Actual
+                    </th>
+                    <th>
+                        Empleado Anterior
+                    </th>
+                    <th>
+                        Número Empleado Anterior
+                    </th>
+                    <th>
+                        Inventario
+                    </th>
+                    <th>
+                        Descripción
+                    </th>
+                    <th>
+                        Serie
                     </th>
                     <th>
                         @Ajax.ActionLink("Numero Activos", "ListarCambios", new { Orden = ViewBag.NumeroActivosSortParam }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
@@ -34,6 +52,7 @@
                         @Ajax.ActionLink("Fecha de Cambio", "ListarCambios", new { Orden = ViewBag.FechaCambioSortParam }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
                         <i class="mdi mdi-sort"></i>
                     </th>
+                    <th>Estatus</th>
                     <th><label></label>Acciones</th>
                 </tr>
             </thead>
@@ -45,6 +64,12 @@
                         <td>@Html.DisplayFor(modelItem => item.IdCambioActivo)</td>
                         <td><strong>@Html.DisplayFor(modelItem => item.FolioCambio)</strong></td>
                         <td><strong>@Html.DisplayFor(modelItem => item.NombreReguardante)</strong></td>
+                        <td><center>@Html.DisplayFor(modelItem => item.NumeroEmpleadoActual)</center></td>
+                        <td><strong>@Html.DisplayFor(modelItem => item.NombreReguardanteAnterior)</strong></td>
+                        <td><center>@Html.DisplayFor(modelItem => item.NumeroEmpleadoAnterior)</center></td>
+                        <td><strong>@Html.DisplayFor(modelItem => item.NumeroInventario)</strong></td>
+                        <td>@Html.DisplayFor(modelItem => item.DescripcionActivo)</td>
+                        <td><center>@Html.DisplayFor(modelItem => item.NumeroSerie)</center></td>
                         <td><center>@Html.DisplayFor(modelItem => item.NumeroCambios)</center></td>
                         <td>
                             <center>
@@ -62,7 +87,18 @@
                         </td>
                         <th>@Html.DisplayFor(modelItem => item.UsuarioCambio)</th>
                         <td><center>@Html.DisplayFor(modelItem => item.FechaCreacion)</center></td>
-                        <!-- Agrega más columnas aquí según tus necesidades -->
+                        <td>
+                            <center>
+                                @if (item.Activo)
+                                {
+                                    <span class="badge bg-success">Activo</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Inactivo</span>
+                                }
+                            </center>
+                        </td>
                         <td>
                             <center>
                                 <div class="btn-group dropdown">
@@ -90,7 +126,23 @@
                 </div>
                 <div class="col-sm-12 col-12 text-right">
                     <div id="pagedList" class="pagedList" data-otf-target="#IndexList">
-                        @Html.PagedListPager(Model, iPagina => Url.Action("ListarCambios", new { iPagina, iPerPage = ViewBag.PerPage, Orden = ViewBag.Order }), PagedList.Mvc.PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(PagedListRenderOptions.ClassicPlusFirstAndLast,
+                        @Html.PagedListPager(Model, iPagina => Url.Action("ListarCambios", new {
+                            iPagina,
+                            iPerPage = ViewBag.PerPage,
+                            Orden = ViewBag.Order,
+                            FolioCambio = ViewBag.FolioCambio,
+                            NumeroInventario = ViewBag.NumeroInventario,
+                            Descripcion = ViewBag.Descripcion,
+                            NumeroSerie = ViewBag.NumeroSerie,
+                            NumeroEmpleadoAnterior = ViewBag.NumeroEmpleadoAnterior,
+                            EmpleadoAnterior = ViewBag.EmpleadoAnterior,
+                            NumeroEmpleadoActual = ViewBag.NumeroEmpleadoActual,
+                            EmpleadoActual = ViewBag.EmpleadoActual,
+                            FolioOficio = ViewBag.FolioOficio,
+                            FechaInicio = ViewBag.FechaInicio,
+                            FechaFin = ViewBag.FechaFin,
+                            Activo = ViewBag.Activo
+                        }), PagedList.Mvc.PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(PagedListRenderOptions.ClassicPlusFirstAndLast,
                               new AjaxOptions
                               {
                                   HttpMethod = "get",
@@ -115,7 +167,6 @@ else
     <p>No se encontraron resultados.</p>
 
 }
-
 
 
 

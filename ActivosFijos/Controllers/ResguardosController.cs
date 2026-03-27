@@ -163,7 +163,24 @@ namespace ActivosFijos.Controllers
             return Json(new { success = true, IdActivos = idActivosArray, DatosGenerales = datosGenerales }, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult ListarCambios(string Orden = "", int iPagina = 1, int iPerPage = 10 , string NombreResguardante = "", DateTime? FechaCambio = null) 
+        public ActionResult ListarCambios(
+            string Orden = "",
+            int iPagina = 1,
+            int iPerPage = 10,
+            string FolioCambio = "",
+            string NumeroInventario = "",
+            string Descripcion = "",
+            string NumeroSerie = "",
+            string NumeroEmpleadoAnterior = "",
+            string EmpleadoAnterior = "",
+            string NumeroEmpleadoActual = "",
+            string EmpleadoActual = "",
+            string FolioOficio = "",
+            DateTime? FechaInicio = null,
+            DateTime? FechaFin = null,
+            bool? Activo = null,
+            string NombreResguardante = "",
+            DateTime? FechaCambio = null)
         {
             ViewBag.Order = Orden;
             ViewBag.PerPage = iPerPage;
@@ -174,11 +191,49 @@ namespace ActivosFijos.Controllers
             ViewBag.UsuarioResponsableSortParam = Orden == "UsuarioCambio" ? "UsuarioCambio_desc" : "UsuarioCambio";
             ViewBag.NombreResguardanteSortParam = Orden == "NombreResguardanteCambio" ? "NombreResguardanteCambio_desc" : "NombreResguardanteCambio";
             ViewBag.FechaCambioSortParam = Orden == "FechaCreacion" ? "FechaCreacion_desc" : "FechaCreacion";
+            ViewBag.NumeroActivosSortParam = Orden == "NumeroCambios" ? "NumeroCambios_desc" : "NumeroCambios";
+            ViewBag.OficioCambioSortParam = Orden == "OficioCambio" ? "OficioCambio_desc" : "OficioCambio";
 
-            ViewBag.NombreResguardante = NombreResguardante;
-            ViewBag.FechaAlta = FechaCambio;
+            if (!string.IsNullOrWhiteSpace(NombreResguardante) && string.IsNullOrWhiteSpace(EmpleadoActual))
+            {
+                EmpleadoActual = NombreResguardante;
+            }
 
-            var vModel = ResguardoB.GetAllCambiosActivos(Orden, iPagina, iPerPage, NombreResguardante, FechaCambio);
+            if (FechaCambio.HasValue && !FechaInicio.HasValue && !FechaFin.HasValue)
+            {
+                FechaInicio = FechaCambio.Value.Date;
+                FechaFin = FechaCambio.Value.Date;
+            }
+
+            ViewBag.FolioCambio = FolioCambio;
+            ViewBag.NumeroInventario = NumeroInventario;
+            ViewBag.Descripcion = Descripcion;
+            ViewBag.NumeroSerie = NumeroSerie;
+            ViewBag.NumeroEmpleadoAnterior = NumeroEmpleadoAnterior;
+            ViewBag.EmpleadoAnterior = EmpleadoAnterior;
+            ViewBag.NumeroEmpleadoActual = NumeroEmpleadoActual;
+            ViewBag.EmpleadoActual = EmpleadoActual;
+            ViewBag.FolioOficio = FolioOficio;
+            ViewBag.FechaInicio = FechaInicio?.ToString("yyyy-MM-dd");
+            ViewBag.FechaFin = FechaFin?.ToString("yyyy-MM-dd");
+            ViewBag.Activo = Activo;
+
+            var vModel = ResguardoB.GetAllCambiosActivos(
+                Orden,
+                iPagina,
+                iPerPage,
+                FolioCambio,
+                NumeroInventario,
+                Descripcion,
+                NumeroSerie,
+                NumeroEmpleadoAnterior,
+                EmpleadoAnterior,
+                NumeroEmpleadoActual,
+                EmpleadoActual,
+                FolioOficio,
+                FechaInicio,
+                FechaFin,
+                Activo);
 
             if (Request.IsAjaxRequest())
             {
