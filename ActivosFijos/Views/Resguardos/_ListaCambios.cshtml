@@ -28,15 +28,6 @@
                         Número Empleado Anterior
                     </th>
                     <th>
-                        Inventario
-                    </th>
-                    <th>
-                        Descripción
-                    </th>
-                    <th>
-                        Serie
-                    </th>
-                    <th>
                         @Ajax.ActionLink("Numero Activos", "ListarCambios", new { Orden = ViewBag.NumeroActivosSortParam }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" })
                         <i class="mdi mdi-sort"></i>
                     </th>
@@ -67,9 +58,6 @@
                         <td><center>@Html.DisplayFor(modelItem => item.NumeroEmpleadoActual)</center></td>
                         <td><strong>@Html.DisplayFor(modelItem => item.NombreReguardanteAnterior)</strong></td>
                         <td><center>@Html.DisplayFor(modelItem => item.NumeroEmpleadoAnterior)</center></td>
-                        <td><strong>@Html.DisplayFor(modelItem => item.NumeroInventario)</strong></td>
-                        <td>@Html.DisplayFor(modelItem => item.DescripcionActivo)</td>
-                        <td><center>@Html.DisplayFor(modelItem => item.NumeroSerie)</center></td>
                         <td><center>@Html.DisplayFor(modelItem => item.NumeroCambios)</center></td>
                         <td>
                             <center>

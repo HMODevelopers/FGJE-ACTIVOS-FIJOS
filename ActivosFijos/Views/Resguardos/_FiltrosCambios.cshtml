@@ -9,7 +9,7 @@
             @using (Ajax.BeginForm("ListarCambios", "Resguardos", new AjaxOptions { HttpMethod = "GET", UpdateTargetId = "resultadosBusqueda", OnBegin = "ShowLoading", OnComplete = "HideLoading" }))
             {
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="form-group">
                             <label for="field-1" class="control-label">Folio de Cambio</label>
                             <div class="input-group">
@@ -22,12 +22,24 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="form-group">
-                            <label for="field-1" class="control-label">Número Inventario</label>
+                            <label class="control-label">Fecha Inicio</label>
                             <div class="input-group">
-                                @Html.TextBox("NumeroInventario", (string)ViewBag.NumeroInventario, new { @class = "form-control filtrar" })
+                                @Html.TextBox("FechaInicio", (string)ViewBag.FechaInicio, new { @class = "form-control filtrar", @type = "date" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="control-label">Fecha Fin</label>
+                            <div class="input-group">
+                                @Html.TextBox("FechaFin", (string)ViewBag.FechaFin, new { @class = "form-control filtrar", @type = "date" })
                                 <div class="input-group-append clean-filter">
                                     <span class="input-group-text">
                                         <i class="mdi mdi-close-circle text-danger"></i>
@@ -38,47 +50,6 @@
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label class="control-label">Descripción</label>
-                            <div class="input-group">
-                                @Html.TextBox("Descripcion", (string)ViewBag.Descripcion, new { @class = "form-control filtrar" })
-                                <div class="input-group-append clean-filter">
-                                    <span class="input-group-text">
-                                        <i class="mdi mdi-close-circle text-danger"></i>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label class="control-label">Número Serie</label>
-                            <div class="input-group">
-                                @Html.TextBox("NumeroSerie", (string)ViewBag.NumeroSerie, new { @class = "form-control filtrar" })
-                                <div class="input-group-append clean-filter">
-                                    <span class="input-group-text">
-                                        <i class="mdi mdi-close-circle text-danger"></i>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label class="control-label">Folio Oficio</label>
-                            <div class="input-group">
-                                @Html.TextBox("FolioOficio", (string)ViewBag.FolioOficio, new { @class = "form-control filtrar" })
-                                <div class="input-group-append clean-filter">
-                                    <span class="input-group-text">
-                                        <i class="mdi mdi-close-circle text-danger"></i>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
                 <div class="row">
                     <div class="col-md-3">
@@ -136,46 +107,8 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label class="control-label">Fecha Inicio</label>
-                            <div class="input-group">
-                                @Html.TextBox("FechaInicio", (string)ViewBag.FechaInicio, new { @class = "form-control filtrar", @type = "date" })
-                                <div class="input-group-append clean-filter">
-                                    <span class="input-group-text">
-                                        <i class="mdi mdi-close-circle text-danger"></i>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label class="control-label">Fecha Fin</label>
-                            <div class="input-group">
-                                @Html.TextBox("FechaFin", (string)ViewBag.FechaFin, new { @class = "form-control filtrar", @type = "date" })
-                                <div class="input-group-append clean-filter">
-                                    <span class="input-group-text">
-                                        <i class="mdi mdi-close-circle text-danger"></i>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label class="control-label">Estatus</label>
-                            @Html.DropDownList(
-                                "Activo",
-                                new List<SelectListItem>
-                                {
-                                    new SelectListItem{ Text = "Todos", Value = "", Selected = string.IsNullOrEmpty(activoSeleccionado) },
-                                    new SelectListItem{ Text = "Activos", Value = "true", Selected = activoSeleccionado == "true" },
-                                    new SelectListItem{ Text = "Inactivos", Value = "false", Selected = activoSeleccionado == "false" }
-                                },
-                                new { @class = "form-control filtrar" })
-                        </div>
-                    </div>
+                  
+                 
                 </div>
             }
         </div>

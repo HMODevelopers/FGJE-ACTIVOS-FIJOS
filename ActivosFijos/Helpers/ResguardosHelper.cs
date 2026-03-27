@@ -212,21 +212,21 @@ namespace ActivosFijos.Helpers
 
 
         public IPagedList<CambiosActivosViewModel> GetAllCambiosActivos(
-            string sOrder,
-            int iPagina,
-            int iPerPage,
-            string FolioCambio = "",
-            string NumeroInventario = "",
-            string Descripcion = "",
-            string NumeroSerie = "",
-            string NumeroEmpleadoAnterior = "",
-            string EmpleadoAnterior = "",
-            string NumeroEmpleadoActual = "",
-            string EmpleadoActual = "",
-            string FolioOficio = "",
-            DateTime? FechaInicio = null,
-            DateTime? FechaFin = null,
-            bool? Activo = null)
+    string sOrder,
+    int iPagina,
+    int iPerPage,
+    string FolioCambio = "",
+    string NumeroInventario = "",
+    string Descripcion = "",
+    string NumeroSerie = "",
+    string NumeroEmpleadoAnterior = "",
+    string EmpleadoAnterior = "",
+    string NumeroEmpleadoActual = "",
+    string EmpleadoActual = "",
+    string FolioOficio = "",
+    DateTime? FechaInicio = null,
+    DateTime? FechaFin = null,
+    bool? Activo = null)
         {
             var vModel = ObtenerCambiosActivos(
                 FolioCambio,
@@ -288,7 +288,6 @@ namespace ActivosFijos.Helpers
             return vModel.ToPagedList(iPagina, iPerPage);
         }
 
-
         private IQueryable<CambiosActivosViewModel> ObtenerCambiosActivos(
             string FolioCambio,
             string NumeroInventario,
@@ -314,6 +313,7 @@ namespace ActivosFijos.Helpers
             var folioOficio = (FolioOficio ?? string.Empty).Trim();
 
             var cambiosQuery = _db.PLU_OP_CambiosActivos.AsNoTracking().AsQueryable();
+
             if (Activo.HasValue)
             {
                 cambiosQuery = cambiosQuery.Where(x => x.Activo == Activo.Value);
@@ -349,12 +349,16 @@ namespace ActivosFijos.Helpers
 
             var detalleQuery =
                 from cambio in cambiosQuery
-                join activo in _db.PLU_OP_Activos.AsNoTracking() on cambio.IdActivos equals activo.IdActivos
-                join empleadoAnteriorData in _db.PLU_OP_Empleados.AsNoTracking() on cambio.IdEmpleadoAnterior equals empleadoAnteriorData.IdEmpleado into empleadoAnteriorJoin
+                join activo in _db.PLU_OP_Activos.AsNoTracking()
+                    on cambio.IdActivos equals activo.IdActivos
+                join empleadoAnteriorData in _db.PLU_OP_Empleados.AsNoTracking()
+                    on cambio.IdEmpleadoAnterior equals empleadoAnteriorData.IdEmpleado into empleadoAnteriorJoin
                 from empleadoAnteriorData in empleadoAnteriorJoin.DefaultIfEmpty()
-                join empleadoActualData in _db.PLU_OP_Empleados.AsNoTracking() on cambio.IdEmpleadoActual equals empleadoActualData.IdEmpleado into empleadoActualJoin
+                join empleadoActualData in _db.PLU_OP_Empleados.AsNoTracking()
+                    on cambio.IdEmpleadoActual equals empleadoActualData.IdEmpleado into empleadoActualJoin
                 from empleadoActualData in empleadoActualJoin.DefaultIfEmpty()
-                join oficio in _db.PLU_OP_OficiosCambios.AsNoTracking() on cambio.IdOficioCambio equals oficio.IdOficioCambio into oficioJoin
+                join oficio in _db.PLU_OP_OficiosCambios.AsNoTracking()
+                    on cambio.IdOficioCambio equals oficio.IdOficioCambio into oficioJoin
                 from oficio in oficioJoin.DefaultIfEmpty()
                 select new
                 {
@@ -366,13 +370,29 @@ namespace ActivosFijos.Helpers
                     NumeroInventario = activo.NumeroInventario,
                     DescripcionActivo = activo.Descripcion,
                     NumeroSerie = activo.NumeroSerie,
-                    NumeroEmpleadoAnterior = empleadoAnteriorData != null && empleadoAnteriorData.NumeroEmpleado.HasValue ? empleadoAnteriorData.NumeroEmpleado.Value.ToString() : string.Empty,
-                    EmpleadoAnterior = empleadoAnteriorData != null ? (empleadoAnteriorData.NombreCompleto ?? ((empleadoAnteriorData.Nombres ?? "") + " " + (empleadoAnteriorData.ApellidoP ?? "") + " " + (empleadoAnteriorData.ApellidoM ?? ""))) : string.Empty,
-                    NumeroEmpleadoActual = empleadoActualData != null && empleadoActualData.NumeroEmpleado.HasValue ? empleadoActualData.NumeroEmpleado.Value.ToString() : string.Empty,
-                    EmpleadoActual = empleadoActualData != null ? (empleadoActualData.NombreCompleto ?? ((empleadoActualData.Nombres ?? "") + " " + (empleadoActualData.ApellidoP ?? "") + " " + (empleadoActualData.ApellidoM ?? ""))) : string.Empty,
+                    NumeroEmpleadoAnterior = empleadoAnteriorData != null && empleadoAnteriorData.NumeroEmpleado.HasValue
+                        ? empleadoAnteriorData.NumeroEmpleado.Value.ToString()
+                        : string.Empty,
+                    EmpleadoAnterior = empleadoAnteriorData != null
+                        ? (empleadoAnteriorData.NombreCompleto
+                            ?? ((empleadoAnteriorData.Nombres ?? "") + " "
+                            + (empleadoAnteriorData.ApellidoP ?? "") + " "
+                            + (empleadoAnteriorData.ApellidoM ?? "")))
+                        : string.Empty,
+                    NumeroEmpleadoActual = empleadoActualData != null && empleadoActualData.NumeroEmpleado.HasValue
+                        ? empleadoActualData.NumeroEmpleado.Value.ToString()
+                        : string.Empty,
+                    EmpleadoActual = empleadoActualData != null
+                        ? (empleadoActualData.NombreCompleto
+                            ?? ((empleadoActualData.Nombres ?? "") + " "
+                            + (empleadoActualData.ApellidoP ?? "") + " "
+                            + (empleadoActualData.ApellidoM ?? "")))
+                        : string.Empty,
                     FolioOficio = oficio != null ? oficio.FolioOficio : string.Empty,
                     RutaOficio = oficio != null ? oficio.RutaOficio : string.Empty,
-                    UsuarioCambio = cambio.PLU_CONF_Usuario != null ? ((cambio.PLU_CONF_Usuario.Nombres ?? "") + " " + (cambio.PLU_CONF_Usuario.Apellidos ?? "")) : "Usuario Desconocido"
+                    UsuarioCambio = cambio.PLU_CONF_Usuario != null
+                        ? ((cambio.PLU_CONF_Usuario.Nombres ?? "") + " " + (cambio.PLU_CONF_Usuario.Apellidos ?? ""))
+                        : "Usuario Desconocido"
                 };
 
             if (!string.IsNullOrEmpty(numeroInventario))
@@ -446,16 +466,22 @@ namespace ActivosFijos.Helpers
                     IdCambioActivo = resumen.IdCambioActivo,
                     FolioCambio = resumen.FolioCambio,
                     NumeroCambios = resumen.NumeroCambios,
-                    OficioCambio = string.IsNullOrEmpty(detalle.RutaOficio) ? "Sin Oficio" : detalle.RutaOficio,
+                    OficioCambio = detalle.RutaOficio == null || detalle.RutaOficio == ""
+                        ? "Sin Oficio"
+                        : detalle.RutaOficio,
                     FolioOficio = detalle.FolioOficio,
-                    NombreReguardante = string.IsNullOrWhiteSpace(detalle.EmpleadoActual) ? "Sin Responsable" : detalle.EmpleadoActual.Trim(),
+                    NombreReguardante = detalle.EmpleadoActual == null || detalle.EmpleadoActual == ""
+                        ? "Sin Responsable"
+                        : detalle.EmpleadoActual,
                     NombreReguardanteAnterior = detalle.EmpleadoAnterior,
                     NumeroEmpleadoAnterior = detalle.NumeroEmpleadoAnterior,
                     NumeroEmpleadoActual = detalle.NumeroEmpleadoActual,
                     NumeroInventario = detalle.NumeroInventario,
                     DescripcionActivo = detalle.DescripcionActivo,
                     NumeroSerie = detalle.NumeroSerie,
-                    UsuarioCambio = detalle.UsuarioCambio.Trim(),
+                    UsuarioCambio = detalle.UsuarioCambio == null || detalle.UsuarioCambio == ""
+                        ? "Usuario Desconocido"
+                        : detalle.UsuarioCambio,
                     FechaCreacion = detalle.FechaCreacion,
                     Activo = detalle.Activo
                 };
