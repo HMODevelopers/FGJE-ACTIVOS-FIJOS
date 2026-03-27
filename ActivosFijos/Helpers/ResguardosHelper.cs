@@ -211,15 +211,37 @@ namespace ActivosFijos.Helpers
 
 
 
-        public IPagedList<CambiosActivosViewModel> GetAllCambiosActivos(string sOrder, int iPagina, int iPerPage, string NombreResguardante, DateTime? FechaCambio)
+        public IPagedList<CambiosActivosViewModel> GetAllCambiosActivos(
+            string sOrder,
+            int iPagina,
+            int iPerPage,
+            string FolioCambio = "",
+            string NumeroInventario = "",
+            string Descripcion = "",
+            string NumeroSerie = "",
+            string NumeroEmpleadoAnterior = "",
+            string EmpleadoAnterior = "",
+            string NumeroEmpleadoActual = "",
+            string EmpleadoActual = "",
+            string FolioOficio = "",
+            DateTime? FechaInicio = null,
+            DateTime? FechaFin = null,
+            bool? Activo = null)
         {
+            var vModel = ObtenerCambiosActivos(
+                FolioCambio,
+                NumeroInventario,
+                Descripcion,
+                NumeroSerie,
+                NumeroEmpleadoAnterior,
+                EmpleadoAnterior,
+                NumeroEmpleadoActual,
+                EmpleadoActual,
+                FolioOficio,
+                FechaInicio,
+                FechaFin,
+                Activo);
 
-            var vModel = ObtenerCambiosActivos();
-
-            vModel = vModel.Where(a => (!FechaCambio.HasValue || DbFunctions.TruncateTime(a.FechaCreacion) == DbFunctions.TruncateTime(FechaCambio.Value))
-            && (NombreResguardante.Length == 0 || a.NombreReguardante.Contains(NombreResguardante)));
-
-            // Ordenar según el parámetro sOrder
             switch (sOrder)
             {
                 case "FolioCambio":
@@ -246,33 +268,199 @@ namespace ActivosFijos.Helpers
                 case "FechaCreacion_desc":
                     vModel = vModel.OrderByDescending(x => x.FechaCreacion);
                     break;
+                case "NumeroCambios":
+                    vModel = vModel.OrderBy(x => x.NumeroCambios);
+                    break;
+                case "NumeroCambios_desc":
+                    vModel = vModel.OrderByDescending(x => x.NumeroCambios);
+                    break;
+                case "OficioCambio":
+                    vModel = vModel.OrderBy(x => x.FolioOficio);
+                    break;
+                case "OficioCambio_desc":
+                    vModel = vModel.OrderByDescending(x => x.FolioOficio);
+                    break;
                 default:
-                    vModel = vModel.OrderBy(x => x.FolioCambio); // Orden predeterminado
+                    vModel = vModel.OrderByDescending(x => x.FechaCreacion);
                     break;
             }
 
-            // Aplicar paginación
             return vModel.ToPagedList(iPagina, iPerPage);
         }
 
 
-        private IQueryable<CambiosActivosViewModel> ObtenerCambiosActivos()
+        private IQueryable<CambiosActivosViewModel> ObtenerCambiosActivos(
+            string FolioCambio,
+            string NumeroInventario,
+            string Descripcion,
+            string NumeroSerie,
+            string NumeroEmpleadoAnterior,
+            string EmpleadoAnterior,
+            string NumeroEmpleadoActual,
+            string EmpleadoActual,
+            string FolioOficio,
+            DateTime? FechaInicio,
+            DateTime? FechaFin,
+            bool? Activo)
         {
-            return _db.PLU_OP_CambiosActivos
-                .Where(x => x.Activo)
-                .GroupBy(x => x.FolioCambio)
-                .Select(g => new CambiosActivosViewModel
+            var folioCambio = (FolioCambio ?? string.Empty).Trim();
+            var numeroInventario = (NumeroInventario ?? string.Empty).Trim();
+            var descripcion = (Descripcion ?? string.Empty).Trim();
+            var numeroSerie = (NumeroSerie ?? string.Empty).Trim();
+            var numeroEmpleadoAnterior = (NumeroEmpleadoAnterior ?? string.Empty).Trim();
+            var empleadoAnterior = (EmpleadoAnterior ?? string.Empty).Trim();
+            var numeroEmpleadoActual = (NumeroEmpleadoActual ?? string.Empty).Trim();
+            var empleadoActual = (EmpleadoActual ?? string.Empty).Trim();
+            var folioOficio = (FolioOficio ?? string.Empty).Trim();
+
+            var cambiosQuery = _db.PLU_OP_CambiosActivos.AsNoTracking().AsQueryable();
+            if (Activo.HasValue)
+            {
+                cambiosQuery = cambiosQuery.Where(x => x.Activo == Activo.Value);
+            }
+            else
+            {
+                cambiosQuery = cambiosQuery.Where(x => x.Activo);
+            }
+
+            if (FechaInicio.HasValue)
+            {
+                var inicio = FechaInicio.Value.Date;
+                cambiosQuery = cambiosQuery.Where(x => x.FechaCreacion >= inicio);
+            }
+
+            if (FechaFin.HasValue)
+            {
+                var finExclusivo = FechaFin.Value.Date.AddDays(1);
+                cambiosQuery = cambiosQuery.Where(x => x.FechaCreacion < finExclusivo);
+            }
+
+            if (!string.IsNullOrEmpty(folioCambio))
+            {
+                if (folioCambio.All(char.IsDigit))
                 {
-                    IdCambioActivo = g.FirstOrDefault() != null ? g.FirstOrDefault().IdCambioActivo : 0,
+                    cambiosQuery = cambiosQuery.Where(x => x.FolioCambio == folioCambio);
+                }
+                else
+                {
+                    cambiosQuery = cambiosQuery.Where(x => x.FolioCambio.Contains(folioCambio));
+                }
+            }
+
+            var detalleQuery =
+                from cambio in cambiosQuery
+                join activo in _db.PLU_OP_Activos.AsNoTracking() on cambio.IdActivos equals activo.IdActivos
+                join empleadoAnteriorData in _db.PLU_OP_Empleados.AsNoTracking() on cambio.IdEmpleadoAnterior equals empleadoAnteriorData.IdEmpleado into empleadoAnteriorJoin
+                from empleadoAnteriorData in empleadoAnteriorJoin.DefaultIfEmpty()
+                join empleadoActualData in _db.PLU_OP_Empleados.AsNoTracking() on cambio.IdEmpleadoActual equals empleadoActualData.IdEmpleado into empleadoActualJoin
+                from empleadoActualData in empleadoActualJoin.DefaultIfEmpty()
+                join oficio in _db.PLU_OP_OficiosCambios.AsNoTracking() on cambio.IdOficioCambio equals oficio.IdOficioCambio into oficioJoin
+                from oficio in oficioJoin.DefaultIfEmpty()
+                select new
+                {
+                    cambio.IdCambioActivo,
+                    cambio.FolioCambio,
+                    cambio.IdActivos,
+                    cambio.FechaCreacion,
+                    cambio.Activo,
+                    NumeroInventario = activo.NumeroInventario,
+                    DescripcionActivo = activo.Descripcion,
+                    NumeroSerie = activo.NumeroSerie,
+                    NumeroEmpleadoAnterior = empleadoAnteriorData != null && empleadoAnteriorData.NumeroEmpleado.HasValue ? empleadoAnteriorData.NumeroEmpleado.Value.ToString() : string.Empty,
+                    EmpleadoAnterior = empleadoAnteriorData != null ? (empleadoAnteriorData.NombreCompleto ?? ((empleadoAnteriorData.Nombres ?? "") + " " + (empleadoAnteriorData.ApellidoP ?? "") + " " + (empleadoAnteriorData.ApellidoM ?? ""))) : string.Empty,
+                    NumeroEmpleadoActual = empleadoActualData != null && empleadoActualData.NumeroEmpleado.HasValue ? empleadoActualData.NumeroEmpleado.Value.ToString() : string.Empty,
+                    EmpleadoActual = empleadoActualData != null ? (empleadoActualData.NombreCompleto ?? ((empleadoActualData.Nombres ?? "") + " " + (empleadoActualData.ApellidoP ?? "") + " " + (empleadoActualData.ApellidoM ?? ""))) : string.Empty,
+                    FolioOficio = oficio != null ? oficio.FolioOficio : string.Empty,
+                    RutaOficio = oficio != null ? oficio.RutaOficio : string.Empty,
+                    UsuarioCambio = cambio.PLU_CONF_Usuario != null ? ((cambio.PLU_CONF_Usuario.Nombres ?? "") + " " + (cambio.PLU_CONF_Usuario.Apellidos ?? "")) : "Usuario Desconocido"
+                };
+
+            if (!string.IsNullOrEmpty(numeroInventario))
+            {
+                if (numeroInventario.All(char.IsDigit))
+                {
+                    detalleQuery = detalleQuery.Where(x => x.NumeroInventario == numeroInventario);
+                }
+                else
+                {
+                    detalleQuery = detalleQuery.Where(x => x.NumeroInventario.Contains(numeroInventario));
+                }
+            }
+
+            if (!string.IsNullOrEmpty(descripcion))
+            {
+                detalleQuery = detalleQuery.Where(x => x.DescripcionActivo.Contains(descripcion));
+            }
+
+            if (!string.IsNullOrEmpty(numeroSerie))
+            {
+                detalleQuery = detalleQuery.Where(x => x.NumeroSerie.Contains(numeroSerie));
+            }
+
+            if (!string.IsNullOrEmpty(numeroEmpleadoAnterior))
+            {
+                detalleQuery = detalleQuery.Where(x => x.NumeroEmpleadoAnterior == numeroEmpleadoAnterior);
+            }
+
+            if (!string.IsNullOrEmpty(empleadoAnterior))
+            {
+                detalleQuery = detalleQuery.Where(x => x.EmpleadoAnterior.Contains(empleadoAnterior));
+            }
+
+            if (!string.IsNullOrEmpty(numeroEmpleadoActual))
+            {
+                detalleQuery = detalleQuery.Where(x => x.NumeroEmpleadoActual == numeroEmpleadoActual);
+            }
+
+            if (!string.IsNullOrEmpty(empleadoActual))
+            {
+                detalleQuery = detalleQuery.Where(x => x.EmpleadoActual.Contains(empleadoActual));
+            }
+
+            if (!string.IsNullOrEmpty(folioOficio))
+            {
+                if (folioOficio.All(char.IsDigit))
+                {
+                    detalleQuery = detalleQuery.Where(x => x.FolioOficio == folioOficio);
+                }
+                else
+                {
+                    detalleQuery = detalleQuery.Where(x => x.FolioOficio.Contains(folioOficio));
+                }
+            }
+
+            var resumenQuery = detalleQuery
+                .GroupBy(x => x.FolioCambio)
+                .Select(g => new
+                {
                     FolioCambio = g.Key,
-                    NumeroCambios = g.Select(x => x.IdActivos).Distinct().Count(),
-                    OficioCambio = g.FirstOrDefault().PLU_OP_OficiosCambios != null ? g.FirstOrDefault().PLU_OP_OficiosCambios.RutaOficio : "Sin Oficio",
-                    NombreReguardante = g.FirstOrDefault().PLU_OP_Activos.PLU_OP_Resguardo.PLU_OP_Empleados != null ? g.FirstOrDefault().PLU_OP_Activos.PLU_OP_Resguardo.PLU_OP_Empleados.Nombres + " " + g.FirstOrDefault().PLU_OP_Activos.PLU_OP_Resguardo.PLU_OP_Empleados.ApellidoP + " " + g.FirstOrDefault().PLU_OP_Activos.PLU_OP_Resguardo.PLU_OP_Empleados.ApellidoM : "Sin Responsable",
-                    UsuarioCambio = g.FirstOrDefault().PLU_CONF_Usuario != null ? g.FirstOrDefault().PLU_CONF_Usuario.Nombres + " " + g.FirstOrDefault().PLU_CONF_Usuario.Apellidos : "Usuario Desconocido",
-                    FechaCreacion = g.FirstOrDefault() != null ? g.FirstOrDefault().FechaCreacion : DateTime.MinValue
-                })
-                .OrderBy(x => x.FolioCambio)
-                .ThenBy(x => x.FechaCreacion);
+                    IdCambioActivo = g.Max(x => x.IdCambioActivo),
+                    NumeroCambios = g.Select(x => x.IdActivos).Distinct().Count()
+                });
+
+            var vModel =
+                from resumen in resumenQuery
+                join detalle in detalleQuery on resumen.IdCambioActivo equals detalle.IdCambioActivo
+                select new CambiosActivosViewModel
+                {
+                    IdCambioActivo = resumen.IdCambioActivo,
+                    FolioCambio = resumen.FolioCambio,
+                    NumeroCambios = resumen.NumeroCambios,
+                    OficioCambio = string.IsNullOrEmpty(detalle.RutaOficio) ? "Sin Oficio" : detalle.RutaOficio,
+                    FolioOficio = detalle.FolioOficio,
+                    NombreReguardante = string.IsNullOrWhiteSpace(detalle.EmpleadoActual) ? "Sin Responsable" : detalle.EmpleadoActual.Trim(),
+                    NombreReguardanteAnterior = detalle.EmpleadoAnterior,
+                    NumeroEmpleadoAnterior = detalle.NumeroEmpleadoAnterior,
+                    NumeroEmpleadoActual = detalle.NumeroEmpleadoActual,
+                    NumeroInventario = detalle.NumeroInventario,
+                    DescripcionActivo = detalle.DescripcionActivo,
+                    NumeroSerie = detalle.NumeroSerie,
+                    UsuarioCambio = detalle.UsuarioCambio.Trim(),
+                    FechaCreacion = detalle.FechaCreacion,
+                    Activo = detalle.Activo
+                };
+
+            return vModel;
         }
 
 
