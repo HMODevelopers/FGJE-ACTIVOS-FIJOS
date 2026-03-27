@@ -9,6 +9,7 @@ namespace ActivosFijos.Services.Pdf
 {
     public class ResguardosPdfBuilder
     {
+        private static readonly ISplitCharacter SplitByAnyCharacter = new AnyCharacterSplit();
         private readonly ModelContext _db;
 
         public ResguardosPdfBuilder(ModelContext db)
@@ -75,7 +76,16 @@ namespace ActivosFijos.Services.Pdf
                 bienesTable.AddCell(new PdfPCell(new Phrase(activo.PLU_CAT_Facturas?.FolioFactura ?? "SIN FACTURA", FontFactory.GetFont(FontFactory.HELVETICA, 5))) { HorizontalAlignment = Element.ALIGN_CENTER });
                 bienesTable.AddCell(new PdfPCell(new Phrase(Truncate(activo.PLU_CAT_CategoriaActivo?.NombreCategoria ?? "SIN CATEGORIA", 10), FontFactory.GetFont(FontFactory.HELVETICA, 5))) { HorizontalAlignment = Element.ALIGN_CENTER });
                 bienesTable.AddCell(new PdfPCell(new Phrase(Truncate(activo.Descripcion ?? "SIN DESCRIPCION", 66), FontFactory.GetFont(FontFactory.HELVETICA, 5))));
-                bienesTable.AddCell(new PdfPCell(new Phrase(Truncate(activo.NumeroSerie ?? "SIN N/S", 15), FontFactory.GetFont(FontFactory.HELVETICA, 5))) { HorizontalAlignment = Element.ALIGN_CENTER });
+                var numeroSerie = activo.NumeroSerie ?? "SIN N/S";
+                var fontNumeroSerie = FontFactory.GetFont(FontFactory.HELVETICA, 5);
+                var chunkNumeroSerie = new Chunk(numeroSerie, fontNumeroSerie) { SplitCharacter = SplitByAnyCharacter };
+                var numeroSerieCell = new PdfPCell(new Phrase(chunkNumeroSerie))
+                {
+                    HorizontalAlignment = Element.ALIGN_CENTER,
+                    VerticalAlignment = Element.ALIGN_MIDDLE,
+                    NoWrap = false
+                };
+                bienesTable.AddCell(numeroSerieCell);
                 bienesTable.AddCell(new PdfPCell(new Phrase(Truncate(activo.PLU_CAT_MarcaActivo?.NombreMarca ?? "SIN MARCA", 10), FontFactory.GetFont(FontFactory.HELVETICA, 5))) { HorizontalAlignment = Element.ALIGN_CENTER });
                 bienesTable.AddCell(new PdfPCell(new Phrase(activo.NumeroInventario ?? "SIN N/I", FontFactory.GetFont(FontFactory.HELVETICA, 5))) { HorizontalAlignment = Element.ALIGN_CENTER });
                 bienesTable.AddCell(new PdfPCell(new Phrase("CAMBIO RESGUARDO", FontFactory.GetFont(FontFactory.HELVETICA, 5))) { HorizontalAlignment = Element.ALIGN_CENTER });
@@ -115,6 +125,20 @@ namespace ActivosFijos.Services.Pdf
             }
 
             return value.Length <= maxLength ? value : value.Substring(0, maxLength);
+        }
+
+        private class AnyCharacterSplit : ISplitCharacter
+        {
+            public bool IsSplitCharacter(int start, int current, int end, char[] cc, PdfChunk[] ck)
+            {
+                if (cc == null || current < 0 || current >= cc.Length)
+                {
+                    return false;
+                }
+
+                var c = cc[current];
+                return c <= ' ' || c == '-' || char.IsLetterOrDigit(c);
+            }
         }
     }
 }
