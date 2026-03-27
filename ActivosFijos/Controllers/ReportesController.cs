@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
@@ -13,6 +14,7 @@ namespace ActivosFijos.Controllers
     public class ReportesController : Controller
     {
         private readonly ModelContext _db = new ModelContext();
+        private const string ExcelMimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
         // ============================================================
         // INDEX (opcional)
@@ -49,7 +51,7 @@ namespace ActivosFijos.Controllers
                 stream.Position = 0;
 
                 string fileName = $"Reporte_Inventario_{DateTime.Now:yyyyMMdd}.xlsx";
-                return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+                return File(stream, ExcelMimeType, fileName);
             }
         }
 
@@ -131,7 +133,7 @@ namespace ActivosFijos.Controllers
                 stream.Position = 0;
 
                 string fileName = $"ActividadUsuarios_{desde:yyyyMMdd}_{hasta:yyyyMMdd}.xlsx";
-                return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+                return File(stream, ExcelMimeType, fileName);
             }
         }
 
@@ -143,6 +145,107 @@ namespace ActivosFijos.Controllers
 
             const string sql = "EXEC DBO.RPT_CONTEOACTIVIDAD_TODOS @FECHADE, @FECHAA";
             return _db.Database.SqlQuery<ActividadUsuariosViewModel>(sql, p1, p2).ToList();
+        }
+
+        // Descarga directa de reporte general de activos.
+        // GET /Reportes/DescargarExcelReporteGeneralActivos
+        [HttpGet]
+        public ActionResult DescargarExcelReporteGeneralActivos()
+        {
+            try
+            {
+                var reporte = ObtenerReporteGeneralActivos();
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+                using (var package = new ExcelPackage())
+                {
+                    var ws = package.Workbook.Worksheets.Add("Reporte General de Activos");
+
+                    for (int i = 0; i < reporte.Encabezados.Count; i++)
+                    {
+                        ws.Cells[1, i + 1].Value = reporte.Encabezados[i];
+                        ws.Cells[1, i + 1].Style.Font.Bold = true;
+                    }
+
+                    for (int row = 0; row < reporte.Filas.Count; row++)
+                    {
+                        var valores = reporte.Filas[row];
+                        for (int col = 0; col < valores.Length; col++)
+                        {
+                            ws.Cells[row + 2, col + 1].Value = valores[col];
+                        }
+                    }
+
+                    ws.Cells.AutoFitColumns();
+                    if (reporte.Encabezados.Count > 0)
+                    {
+                        ws.Cells[1, 1, Math.Max(1, reporte.Filas.Count + 1), reporte.Encabezados.Count].AutoFilter = true;
+                    }
+
+                    var stream = new MemoryStream();
+                    package.SaveAs(stream);
+                    stream.Position = 0;
+
+                    string fileName = $"Reporte_General_Activos_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
+                    return File(stream, ExcelMimeType, fileName);
+                }
+            }
+            catch (Exception)
+            {
+                TempData["Error"] = "No fue posible generar el Reporte General de Activos.";
+                return RedirectToAction("Index", "Home");
+            }
+        }
+
+        private ReporteTabularExcelViewModel ObtenerReporteGeneralActivos()
+        {
+            var salida = new ReporteTabularExcelViewModel();
+            var conexion = _db.Database.Connection;
+            var abrirConexion = conexion.State != ConnectionState.Open;
+
+            try
+            {
+                if (abrirConexion)
+                {
+                    conexion.Open();
+                }
+
+                using (var cmd = conexion.CreateCommand())
+                {
+                    cmd.CommandText = "dbo.sp_ReporteGeneralActivos";
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        for (int i = 0; i < reader.FieldCount; i++)
+                        {
+                            salida.Encabezados.Add(reader.GetName(i));
+                        }
+
+                        while (reader.Read())
+                        {
+                            var fila = new object[reader.FieldCount];
+                            reader.GetValues(fila);
+                            salida.Filas.Add(fila);
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                if (abrirConexion && conexion.State == ConnectionState.Open)
+                {
+                    conexion.Close();
+                }
+            }
+
+            return salida;
+        }
+
+        private sealed class ReporteTabularExcelViewModel
+        {
+            public List<string> Encabezados { get; } = new List<string>();
+            public List<object[]> Filas { get; } = new List<object[]>();
         }
     }
 }
