@@ -43,7 +43,7 @@ namespace ActivosFijos.Services.Pdf
                 bienesTable.AddCell(new PdfPCell(new Phrase(activo.NumeroSerie ?? "SIN N/S", FontFactory.GetFont(FontFactory.HELVETICA, 5))) { HorizontalAlignment = Element.ALIGN_CENTER });
                 bienesTable.AddCell(new PdfPCell(new Phrase(activo.PLU_CAT_MarcaActivo?.NombreMarca ?? "SIN MARCA", FontFactory.GetFont(FontFactory.HELVETICA, 5))) { HorizontalAlignment = Element.ALIGN_CENTER });
                 bienesTable.AddCell(new PdfPCell(new Phrase(activo.NumeroInventario ?? "SIN N/I", FontFactory.GetFont(FontFactory.HELVETICA, 5))) { HorizontalAlignment = Element.ALIGN_CENTER });
-                bienesTable.AddCell(new PdfPCell(new Phrase("ASIGNADO", FontFactory.GetFont(FontFactory.HELVETICA, 5))) { HorizontalAlignment = Element.ALIGN_CENTER });
+                bienesTable.AddCell(new PdfPCell(new Phrase("ALTA RESGUARDO", FontFactory.GetFont(FontFactory.HELVETICA, 5))) { HorizontalAlignment = Element.ALIGN_CENTER });
                 bienesTable.AddCell(new PdfPCell(new Phrase(fechaCreacion.ToString("dd/MM/yyyy"), FontFactory.GetFont(FontFactory.HELVETICA, 5))) { HorizontalAlignment = Element.ALIGN_CENTER });
             }
 

@@ -34,11 +34,11 @@ namespace ActivosFijos.Services.Pdf
                 bienesTable.AddCell(new PdfPCell(new Phrase(activo.PLU_OP_Activos.NumeroInventario ?? "SIN N/I", FontFactory.GetFont(FontFactory.HELVETICA, 5))) { HorizontalAlignment = Element.ALIGN_CENTER });
                 if (activo.Activo == true)
                 {
-                    bienesTable.AddCell(new PdfPCell(new Phrase("Resguardo", FontFactory.GetFont(FontFactory.HELVETICA, 6))) { HorizontalAlignment = Element.ALIGN_CENTER });
+                    bienesTable.AddCell(new PdfPCell(new Phrase("IF", FontFactory.GetFont(FontFactory.HELVETICA, 6))) { HorizontalAlignment = Element.ALIGN_CENTER });
                 }
                 else
                 {
-                    bienesTable.AddCell(new PdfPCell(new Phrase("Resguardo", FontFactory.GetFont(FontFactory.HELVETICA, 6))) { HorizontalAlignment = Element.ALIGN_CENTER });
+                    bienesTable.AddCell(new PdfPCell(new Phrase("Pendiente", FontFactory.GetFont(FontFactory.HELVETICA, 6))) { HorizontalAlignment = Element.ALIGN_CENTER });
                 }
 
                 bienesTable.AddCell(new PdfPCell(new Phrase(activo.FechaCreacion.ToString("dd/MM/yyyy"), FontFactory.GetFont(FontFactory.HELVETICA, 6))) { HorizontalAlignment = Element.ALIGN_CENTER });
@@ -75,11 +75,11 @@ namespace ActivosFijos.Services.Pdf
                 bienesTable.AddCell(new PdfPCell(new Phrase(activo.PLU_OP_Activos.NumeroInventario ?? "SIN N/I", FontFactory.GetFont(FontFactory.HELVETICA, 5))) { HorizontalAlignment = Element.ALIGN_CENTER });
                 if (activo.Activo == true)
                 {
-                    bienesTable.AddCell(new PdfPCell(new Phrase("Resguardo", FontFactory.GetFont(FontFactory.HELVETICA, 6))) { HorizontalAlignment = Element.ALIGN_CENTER });
+                    bienesTable.AddCell(new PdfPCell(new Phrase("IF", FontFactory.GetFont(FontFactory.HELVETICA, 6))) { HorizontalAlignment = Element.ALIGN_CENTER });
                 }
                 else
                 {
-                    bienesTable.AddCell(new PdfPCell(new Phrase("Resguardo", FontFactory.GetFont(FontFactory.HELVETICA, 6))) { HorizontalAlignment = Element.ALIGN_CENTER });
+                    bienesTable.AddCell(new PdfPCell(new Phrase("Pendiente", FontFactory.GetFont(FontFactory.HELVETICA, 6))) { HorizontalAlignment = Element.ALIGN_CENTER });
                 }
 
                 bienesTable.AddCell(new PdfPCell(new Phrase(activo.FechaCreacion.ToString("dd/MM/yyyy"), FontFactory.GetFont(FontFactory.HELVETICA, 6))) { HorizontalAlignment = Element.ALIGN_CENTER });
