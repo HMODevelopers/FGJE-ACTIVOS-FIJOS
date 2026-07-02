@@ -184,7 +184,6 @@
         <div class="card">
             <div class="card-body">
                 <h4 class="header-title mb-3">Seguimiento trimestral de inventarios (@Model.AnioSeguimiento)</h4>
-                <h5 class="font-15 mb-3">Cumplimiento de metas trimestrales</h5>
 
                 <div class="table-responsive">
                     <table class="table table-striped table-bordered">
@@ -193,9 +192,10 @@
                                 <th>Trimestre</th>
                                 <th>Periodo</th>
                                 <th>Meta</th>
-                                <th>Inventarios realizados</th>
-                                <th>Activos únicos inventariados</th>
-                                <th>Empleados visitados</th>
+                                <th>Folios realizados</th>
+                                <th>Encontrados únicos válidos</th>
+                                <th>Pendientes depurados</th>
+                                <th>Empleados visitados únicos</th>
                                 <th style="min-width: 180px;">Avance</th>
                                 <th>Diferencia</th>
                                 <th>Cumplimiento</th>
@@ -220,20 +220,17 @@
                                         badgeClass = "badge-info";
                                     }
 
-                                    var diferencia = trimestre.Diferencia > 0
-                                        ? "+" + trimestre.Diferencia.ToString("N0")
-                                        : trimestre.Diferencia.ToString("N0");
-                                    var diferenciaClass = trimestre.Diferencia > 0
-                                        ? "text-success"
-                                        : trimestre.Diferencia < 0 ? "text-danger" : "text-muted";
+                                    var diferencia = trimestre.Diferencia > 0 ? "+" + trimestre.Diferencia.ToString("N0") : trimestre.Diferencia.ToString("N0");
+                                    var diferenciaClass = trimestre.Diferencia > 0  ? "text-success" : trimestre.Diferencia < 0 ? "text-danger" : "text-muted";
 
                                     <tr>
                                         <td>@trimestre.NombreTrimestre</td>
                                         <td>@trimestre.Periodo</td>
                                         <td>@trimestre.Meta.ToString("N0")</td>
-                                        <td>@trimestre.InventariosRealizados.ToString("N0")</td>
-                                        <td>@trimestre.ActivosUnicosInventariados.ToString("N0")</td>
-                                        <td>@trimestre.EmpleadosVisitados.ToString("N0")</td>
+                                        <td>@trimestre.FoliosRealizados.ToString("N0")</td>
+                                        <td>@trimestre.EncontradosUnicosValidos.ToString("N0")</td>
+                                        <td>@trimestre.PendientesDepurados.ToString("N0")</td>
+                                        <td>@trimestre.EmpleadosVisitadosUnicos.ToString("N0")</td>
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <span class="mr-2">@trimestre.PorcentajeAvance.ToString("N2")%</span>
@@ -250,7 +247,7 @@
                             else
                             {
                                 <tr>
-                                    <td colspan="9" class="text-center text-muted">No hay información de seguimiento trimestral.</td>
+                                    <td colspan="10" class="text-center text-muted">No hay información de seguimiento trimestral.</td>
                                 </tr>
                             }
                         </tbody>

@@ -45,32 +45,81 @@ namespace ActivosFijos.Controllers
             var inicioAnio = new DateTime(anio, 1, 1);
             var finAnio = inicioAnio.AddYears(1);
             var anioActual = DateTime.Now.Year;
-            var trimestreActual = anioActual == anio ? ((DateTime.Now.Month - 1) / 3) + 1 : 0;
+            var trimestreActual = anioActual == anio ? ObtenerTrimestre(DateTime.Now) : 0;
 
-            var inventariosPorTrimestre = _db.PLU_OP_InventarioFisico
+            var detallesInventario = _db.PLU_OP_InventarioFisico
                 .AsNoTracking()
-                .Where(i => i.Activo && i.FechaInventario >= inicioAnio && i.FechaInventario < finAnio)
-                .GroupBy(i => ((i.FechaInventario.Month - 1) / 3) + 1)
-                .Select(g => new
+                .Where(i => i.FechaInventario >= inicioAnio && i.FechaInventario < finAnio)
+                .Select(i => new
                 {
-                    Trimestre = g.Key,
-                    InventariosRealizados = g.Count(),
-                    ActivosUnicosInventariados = g.Select(i => i.IdActivo).Distinct().Count(),
-                    EmpleadosVisitados = g.Where(i => i.NumeroEmpleado > 0)
-                        .Select(i => i.NumeroEmpleado)
-                        .Distinct()
-                        .Count()
+                    i.IdInventario,
+                    i.FolioInventario,
+                    i.IdActivo,
+                    i.NumeroEmpleado,
+                    i.FechaInventario,
+                    i.Activo
                 })
                 .ToList();
 
+            var foliosPorTrimestre = detallesInventario
+                .Where(i => !string.IsNullOrWhiteSpace(i.FolioInventario))
+                .GroupBy(i => i.FolioInventario.Trim())
+                .Select(g => new
+                {
+                    Trimestre = ObtenerTrimestre(g.Min(i => i.FechaInventario))
+                })
+                .GroupBy(f => f.Trimestre)
+                .ToDictionary(g => g.Key, g => g.Count());
+
+            var detalleDepuradoPorFolioActivo = detallesInventario
+                .Where(i => !string.IsNullOrWhiteSpace(i.FolioInventario))
+                .GroupBy(i => new { FolioInventario = i.FolioInventario.Trim(), i.IdActivo })
+                .Select(g => new
+                {
+                    g.Key.FolioInventario,
+                    g.Key.IdActivo,
+                    FechaGrupo = g.Min(i => i.FechaInventario),
+                    IdInventarioOrden = g.Min(i => i.IdInventario),
+                    ResultadoEncontrado = g.Any(i => i.Activo)
+                })
+                .ToList();
+
+            var encontradosPorTrimestre = detalleDepuradoPorFolioActivo
+                .Where(i => i.ResultadoEncontrado)
+                .GroupBy(i => i.IdActivo)
+                .Select(g => g
+                    .OrderBy(i => i.FechaGrupo)
+                    .ThenBy(i => i.FolioInventario)
+                    .ThenBy(i => i.IdInventarioOrden)
+                    .First())
+                .GroupBy(i => ObtenerTrimestre(i.FechaGrupo))
+                .ToDictionary(g => g.Key, g => g.Count());
+
+            var pendientesPorTrimestre = detalleDepuradoPorFolioActivo
+                .Where(i => !i.ResultadoEncontrado)
+                .GroupBy(i => ObtenerTrimestre(i.FechaGrupo))
+                .ToDictionary(g => g.Key, g => g.Count());
+
+            var empleadosPorTrimestre = detallesInventario
+                .Where(i => i.NumeroEmpleado > 0)
+                .GroupBy(i => i.NumeroEmpleado.ToString().Trim())
+                .Select(g => new
+                {
+                    Trimestre = ObtenerTrimestre(g.Min(i => i.FechaInventario))
+                })
+                .GroupBy(e => e.Trimestre)
+                .ToDictionary(g => g.Key, g => g.Count());
+
             return ObtenerMetasTrimestralesInventario().Select(metaTrimestral =>
             {
-                var inventario = inventariosPorTrimestre.FirstOrDefault(i => i.Trimestre == metaTrimestral.Trimestre);
-                var activosUnicosInventariados = inventario != null ? inventario.ActivosUnicosInventariados : 0;
+                var foliosRealizados = ObtenerConteoTrimestral(foliosPorTrimestre, metaTrimestral.Trimestre);
+                var encontradosUnicosValidos = ObtenerConteoTrimestral(encontradosPorTrimestre, metaTrimestral.Trimestre);
+                var pendientesDepurados = ObtenerConteoTrimestral(pendientesPorTrimestre, metaTrimestral.Trimestre);
+                var empleadosVisitadosUnicos = ObtenerConteoTrimestral(empleadosPorTrimestre, metaTrimestral.Trimestre);
                 var porcentajeAvance = metaTrimestral.Meta == 0
                     ? 0
-                    : Math.Round((decimal)activosUnicosInventariados * 100 / metaTrimestral.Meta, 2);
-                var diferencia = activosUnicosInventariados - metaTrimestral.Meta;
+                    : Math.Round((decimal)encontradosUnicosValidos * 100 / metaTrimestral.Meta, 2);
+                var diferencia = encontradosUnicosValidos - metaTrimestral.Meta;
 
                 return new DashboardTrimestreViewModel
                 {
@@ -78,15 +127,27 @@ namespace ActivosFijos.Controllers
                     NombreTrimestre = metaTrimestral.Nombre,
                     Periodo = metaTrimestral.Periodo,
                     Meta = metaTrimestral.Meta,
-                    InventariosRealizados = inventario != null ? inventario.InventariosRealizados : 0,
-                    ActivosUnicosInventariados = activosUnicosInventariados,
-                    EmpleadosVisitados = inventario != null ? inventario.EmpleadosVisitados : 0,
+                    FoliosRealizados = foliosRealizados,
+                    EncontradosUnicosValidos = encontradosUnicosValidos,
+                    PendientesDepurados = pendientesDepurados,
+                    EmpleadosVisitadosUnicos = empleadosVisitadosUnicos,
                     PorcentajeAvance = porcentajeAvance,
                     Diferencia = diferencia,
-                    CumpleMeta = activosUnicosInventariados >= metaTrimestral.Meta,
-                    Cumplimiento = ObtenerCumplimientoTrimestre(activosUnicosInventariados, metaTrimestral.Meta, metaTrimestral.Trimestre, anio, anioActual, trimestreActual)
+                    CumpleMeta = encontradosUnicosValidos >= metaTrimestral.Meta,
+                    Cumplimiento = ObtenerCumplimientoTrimestre(encontradosUnicosValidos, metaTrimestral.Meta, metaTrimestral.Trimestre, anio, anioActual, trimestreActual)
                 };
             }).ToList();
+        }
+
+        private int ObtenerTrimestre(DateTime fecha)
+        {
+            return ((fecha.Month - 1) / 3) + 1;
+        }
+
+        private int ObtenerConteoTrimestral(Dictionary<int, int> conteosPorTrimestre, int trimestre)
+        {
+            int conteo;
+            return conteosPorTrimestre.TryGetValue(trimestre, out conteo) ? conteo : 0;
         }
 
         private List<MetaTrimestralInventario> ObtenerMetasTrimestralesInventario()

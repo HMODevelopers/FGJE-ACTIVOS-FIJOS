@@ -22,9 +22,10 @@ namespace ActivosFijos.Models.ViewModels
         public string NombreTrimestre { get; set; }
         public string Periodo { get; set; }
         public int Meta { get; set; }
-        public int InventariosRealizados { get; set; }
-        public int ActivosUnicosInventariados { get; set; }
-        public int EmpleadosVisitados { get; set; }
+        public int FoliosRealizados { get; set; }
+        public int EncontradosUnicosValidos { get; set; }
+        public int PendientesDepurados { get; set; }
+        public int EmpleadosVisitadosUnicos { get; set; }
         public decimal PorcentajeAvance { get; set; }
         public int Diferencia { get; set; }
         public string Cumplimiento { get; set; }
