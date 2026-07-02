@@ -3,9 +3,11 @@ using ActivosFijos.Models.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.SqlServer;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using PagedList;
 using static EDUES_ADMIN.Filters.AdminFilters;
 
 namespace ActivosFijos.Controllers
@@ -14,7 +16,7 @@ namespace ActivosFijos.Controllers
     public class HomeController : Controller
     {
         public ModelContext _db = new ModelContext();
-        public ActionResult Index()
+        public ActionResult Index(string busquedaSinInventario = "", string corporacionSinInventario = "", int iPaginaSinInventario = 1, int iPerPageSinInventario = 25)
         {
             // Filtrar activos según su estatus
             var enAlmacen = _db.PLU_OP_Activos.Count(a => a.PLU_CAT_EstatusActivo.Descripcion == "En Almacén");
@@ -26,6 +28,16 @@ namespace ActivosFijos.Controllers
 
             int anioSeguimiento = DateTime.Now.Year;
 
+            if (iPaginaSinInventario < 1) iPaginaSinInventario = 1;
+            var pageSizesSinInventario = new[] { 10, 25, 50, 100 };
+            if (!pageSizesSinInventario.Contains(iPerPageSinInventario)) iPerPageSinInventario = 25;
+
+            ViewBag.BusquedaSinInventario = busquedaSinInventario;
+            ViewBag.CorporacionSinInventario = corporacionSinInventario;
+            ViewBag.PaginaSinInventario = iPaginaSinInventario;
+            ViewBag.PerPageSinInventario = iPerPageSinInventario;
+            ViewBag.PageSizesSinInventario = pageSizesSinInventario;
+
             // Pasar los datos al modelo de la vista
             var model = new DashboardViewModel
             {
@@ -35,7 +47,7 @@ namespace ActivosFijos.Controllers
                 TotalActivos = totalActivos,
                 AnioSeguimiento = anioSeguimiento,
                 SeguimientoTrimestral = ObtenerSeguimientoTrimestral(anioSeguimiento),
-                EmpleadosSinInventarioHistorico = ObtenerEmpleadosSinInventarioHistorico()
+                EmpleadosSinInventarioHistorico = ObtenerEmpleadosSinInventarioHistorico(busquedaSinInventario, corporacionSinInventario, iPaginaSinInventario, iPerPageSinInventario)
             };
 
             return View(model);
@@ -191,69 +203,102 @@ namespace ActivosFijos.Controllers
             return activosUnicosInventariados == 0 ? "Sin actividad" : "No cumple";
         }
 
-        private List<EmpleadoSinInventarioHistoricoViewModel> ObtenerEmpleadosSinInventarioHistorico()
+        private IPagedList<EmpleadoSinInventarioHistoricoViewModel> ObtenerEmpleadosSinInventarioHistorico(string busqueda, string corporacion, int iPagina, int iPerPage)
         {
-            var empleadosBase = (from activo in _db.PLU_OP_Activos.AsNoTracking()
-                                 join resguardo in _db.PLU_OP_Resguardo.AsNoTracking() on activo.IdResguardo equals (int?)resguardo.IdResguardo
-                                 join empleado in _db.PLU_OP_Empleados.AsNoTracking() on resguardo.IdEmpleado equals empleado.IdEmpleado
-                                 where activo.Activo
-                                     && activo.IdEstatusActivo == 2
-                                     && activo.IdResguardo != null
-                                     && resguardo.Activo
-                                     && empleado.Activo
-                                 group new { activo, resguardo, empleado } by new
-                                 {
-                                     empleado.IdEmpleado,
-                                     empleado.NumeroEmpleado,
-                                     empleado.NombreCompleto
-                                 } into grupo
-                                 let totalActivosConInventarioHistorico = grupo.Count(x => _db.PLU_OP_InventarioFisico.Any(i => i.Activo && i.IdActivo == x.activo.IdActivos))
-                                 where grupo.Count() > 0 && totalActivosConInventarioHistorico == 0
-                                 orderby grupo.Count() descending, grupo.Key.NombreCompleto
-                                 select new
-                                 {
-                                     grupo.Key.IdEmpleado,
-                                     grupo.Key.NumeroEmpleado,
-                                     grupo.Key.NombreCompleto,
-                                     TotalActivosAsignados = grupo.Count(),
-                                     TotalActivosConInventarioHistorico = totalActivosConInventarioHistorico,
-                                     TotalResguardos = grupo.Select(x => x.resguardo.IdResguardo).Distinct().Count(),
-                                     FechaPrimerActivoAsignado = grupo.Min(x => (DateTime?)x.activo.FechaCreacion)
-                                 })
-                .Take(20)
-                .ToList();
+            busqueda = (busqueda ?? string.Empty).Trim();
+            corporacion = (corporacion ?? string.Empty).Trim();
 
-            var idsEmpleado = empleadosBase.Select(e => e.IdEmpleado).ToList();
-            var adscripciones = _db.PLU_OP_Adscripcion
-                .AsNoTracking()
-                .Where(a => idsEmpleado.Contains(a.IdEmpleado))
-                .OrderByDescending(a => a.FechaInicioAdscripcion)
-                .ThenByDescending(a => a.FechaRegistro)
-                .ThenByDescending(a => a.IdAdscripcion)
-                .ToList()
-                .GroupBy(a => a.IdEmpleado)
-                .ToDictionary(g => g.Key, g => g.First());
+            var empleadosBase = from activo in _db.PLU_OP_Activos.AsNoTracking()
+                                join resguardo in _db.PLU_OP_Resguardo.AsNoTracking()
+                                    on activo.IdResguardo equals (int?)resguardo.IdResguardo
+                                join empleado in _db.PLU_OP_Empleados.AsNoTracking()
+                                    on resguardo.IdEmpleado equals empleado.IdEmpleado
+                                where activo.Activo
+                                    && activo.IdEstatusActivo == 2
+                                    && activo.IdResguardo != null
+                                    && resguardo.Activo
+                                    && empleado.Activo
+                                    && empleado.NumeroEmpleado.HasValue
+                                    && !_db.PLU_OP_InventarioFisico.Any(i => i.NumeroEmpleado == empleado.NumeroEmpleado.Value)
+                                group new { activo, resguardo, empleado } by new
+                                {
+                                    empleado.IdEmpleado,
+                                    empleado.NumeroEmpleado,
+                                    empleado.NombreCompleto
+                                } into grupo
+                                select new
+                                {
+                                    grupo.Key.IdEmpleado,
+                                    grupo.Key.NumeroEmpleado,
+                                    grupo.Key.NombreCompleto,
+                                    TotalActivosAsignados = grupo.Select(x => x.activo.IdActivos).Distinct().Count(),
+                                    TotalResguardos = grupo.Select(x => x.resguardo.IdResguardo).Distinct().Count(),
+                                    FechaPrimerActivoAsignado = grupo.Min(x => (DateTime?)x.activo.FechaCreacion)
+                                };
 
-            return empleadosBase.Select(e =>
+            var consulta = empleadosBase.Select(e => new EmpleadoSinInventarioHistoricoViewModel
             {
-                PLU_OP_Adscripcion adscripcion;
-                adscripciones.TryGetValue(e.IdEmpleado, out adscripcion);
+                IdEmpleado = e.IdEmpleado,
+                NumeroEmpleado = SqlFunctions.StringConvert((double)e.NumeroEmpleado.Value).Trim(),
+                NombreCompleto = e.NombreCompleto,
 
-                return new EmpleadoSinInventarioHistoricoViewModel
-                {
-                    IdEmpleado = e.IdEmpleado,
-                    NumeroEmpleado = e.NumeroEmpleado.HasValue ? e.NumeroEmpleado.Value.ToString() : string.Empty,
-                    NombreCompleto = e.NombreCompleto,
-                    Area = adscripcion != null ? adscripcion.Area : "Sin adscripción",
-                    Corporacion = adscripcion != null ? adscripcion.Corporacion : string.Empty,
-                    Entidad = adscripcion != null ? adscripcion.Entidad : string.Empty,
-                    PuestoFuncional = adscripcion != null ? adscripcion.PuestoFuncional : string.Empty,
-                    TotalActivosAsignados = e.TotalActivosAsignados,
-                    TotalResguardos = e.TotalResguardos,
-                    FechaPrimerActivoAsignado = e.FechaPrimerActivoAsignado,
-                    Estatus = "Sin inventario histórico"
-                };
-            }).ToList();
+                Corporacion = _db.PLU_OP_Adscripcion
+                    .Where(a => a.IdEmpleado == e.IdEmpleado)
+                    .OrderByDescending(a => a.FechaInicioAdscripcion)
+                    .ThenByDescending(a => a.FechaRegistro)
+                    .ThenByDescending(a => a.IdAdscripcion)
+                    .Select(a => a.Corporacion)
+                    .FirstOrDefault(),
+
+                Area = _db.PLU_OP_Adscripcion
+                    .Where(a => a.IdEmpleado == e.IdEmpleado)
+                    .OrderByDescending(a => a.FechaInicioAdscripcion)
+                    .ThenByDescending(a => a.FechaRegistro)
+                    .ThenByDescending(a => a.IdAdscripcion)
+                    .Select(a => a.Area)
+                    .FirstOrDefault(),
+
+                PuestoFuncional = _db.PLU_OP_Adscripcion
+                    .Where(a => a.IdEmpleado == e.IdEmpleado)
+                    .OrderByDescending(a => a.FechaInicioAdscripcion)
+                    .ThenByDescending(a => a.FechaRegistro)
+                    .ThenByDescending(a => a.IdAdscripcion)
+                    .Select(a => a.PuestoFuncional)
+                    .FirstOrDefault(),
+
+                Municipio = _db.PLU_OP_Adscripcion
+                    .Where(a => a.IdEmpleado == e.IdEmpleado)
+                    .OrderByDescending(a => a.FechaInicioAdscripcion)
+                    .ThenByDescending(a => a.FechaRegistro)
+                    .ThenByDescending(a => a.IdAdscripcion)
+                    .Select(a => a.PLU_CAT_Municipios.NombreMunicipio)
+                    .FirstOrDefault(),
+
+                TotalActivosAsignados = e.TotalActivosAsignados,
+                TotalResguardos = e.TotalResguardos,
+                FechaPrimerActivoAsignado = e.FechaPrimerActivoAsignado,
+                Estatus = "Sin inventario histórico"
+            });
+
+            if (!string.IsNullOrWhiteSpace(busqueda))
+            {
+                consulta = consulta.Where(e => e.NumeroEmpleado.Contains(busqueda)
+                    || e.NombreCompleto.Contains(busqueda)
+                    || e.Corporacion.Contains(busqueda)
+                    || e.Area.Contains(busqueda)
+                    || e.PuestoFuncional.Contains(busqueda));
+            }
+
+            if (!string.IsNullOrWhiteSpace(corporacion))
+            {
+                consulta = consulta.Where(e => e.Corporacion.Contains(corporacion));
+            }
+
+            return consulta
+                .OrderBy(e => e.Corporacion)
+                .ThenByDescending(e => e.TotalActivosAsignados)
+                .ThenBy(e => e.NombreCompleto)
+                .ToPagedList(iPagina, iPerPage);
         }
 
         public JsonResult GetOperacionesPorMes(int? anio)

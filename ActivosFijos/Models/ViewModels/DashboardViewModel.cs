@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using PagedList;
 
 namespace ActivosFijos.Models.ViewModels
 {
@@ -13,7 +14,7 @@ namespace ActivosFijos.Models.ViewModels
         public int TotalActivos { get; set; }  // Total de activos
         public int AnioSeguimiento { get; set; }
         public List<DashboardTrimestreViewModel> SeguimientoTrimestral { get; set; }
-        public List<EmpleadoSinInventarioHistoricoViewModel> EmpleadosSinInventarioHistorico { get; set; }
+        public IPagedList<EmpleadoSinInventarioHistoricoViewModel> EmpleadosSinInventarioHistorico { get; set; }
     }
 
     public class DashboardTrimestreViewModel
@@ -49,6 +50,7 @@ namespace ActivosFijos.Models.ViewModels
         public string Corporacion { get; set; }
         public string Entidad { get; set; }
         public string PuestoFuncional { get; set; }
+        public string Municipio { get; set; }
         public int TotalActivosAsignados { get; set; }
         public int TotalResguardos { get; set; }
         public DateTime? FechaPrimerActivoAsignado { get; set; }
