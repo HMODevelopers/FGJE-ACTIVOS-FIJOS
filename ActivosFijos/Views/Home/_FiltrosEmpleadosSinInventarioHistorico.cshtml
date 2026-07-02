@@ -1,0 +1,93 @@
+﻿<div class="card-header" style="border-color:darkgray; border-style:dotted;">
+    <h5>Filtros</h5>
+
+    <div class="row">
+        <div class="col-lg-12">
+            @using (Ajax.BeginForm("Index", "Home", new AjaxOptions { HttpMethod = "GET", UpdateTargetId = "resultadosBusquedaSinInventario", OnBegin = "ShowLoading", OnComplete = "HideLoading" }))
+            {
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="numeroEmpleadoSinInventario" class="control-label">Número empleado</label>
+                            <div class="input-group">
+                                @Html.TextBox("numeroEmpleadoSinInventario", ViewBag.NumeroEmpleadoSinInventario as string, new { @class = "form-control filtrar" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="nombreCompletoSinInventario" class="control-label">Nombre completo</label>
+                            <div class="input-group">
+                                @Html.TextBox("nombreCompletoSinInventario", ViewBag.NombreCompletoSinInventario as string, new { @class = "form-control filtrar" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="corporacionSinInventario" class="control-label">Corporación</label>
+                            <div class="input-group">
+                                @Html.TextBox("corporacionSinInventario", ViewBag.CorporacionSinInventario as string, new { @class = "form-control filtrar" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="areaSinInventario" class="control-label">Área</label>
+                            <div class="input-group">
+                                @Html.TextBox("areaSinInventario", ViewBag.AreaSinInventario as string, new { @class = "form-control filtrar" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="puestoFuncionalSinInventario" class="control-label">Puesto funcional</label>
+                            <div class="input-group">
+                                @Html.TextBox("puestoFuncionalSinInventario", ViewBag.PuestoFuncionalSinInventario as string, new { @class = "form-control filtrar" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="municipioSinInventario" class="control-label">Municipio</label>
+                            <div class="input-group">
+                                @Html.TextBox("municipioSinInventario", ViewBag.MunicipioSinInventario as string, new { @class = "form-control filtrar" })
+                                <div class="input-group-append clean-filter">
+                                    <span class="input-group-text">
+                                        <i class="mdi mdi-close-circle text-danger"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

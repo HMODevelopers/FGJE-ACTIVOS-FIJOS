@@ -16,7 +16,7 @@ namespace ActivosFijos.Controllers
     public class HomeController : Controller
     {
         public ModelContext _db = new ModelContext();
-        public ActionResult Index(string busquedaSinInventario = "", string corporacionSinInventario = "", int iPaginaSinInventario = 1, int iPerPageSinInventario = 25)
+        public ActionResult Index(string numeroEmpleadoSinInventario = "", string nombreCompletoSinInventario = "", string corporacionSinInventario = "", string areaSinInventario = "", string puestoFuncionalSinInventario = "", string municipioSinInventario = "", int iPaginaSinInventario = 1, int iPerPageSinInventario = 25)
         {
             // Filtrar activos según su estatus
             var enAlmacen = _db.PLU_OP_Activos.Count(a => a.PLU_CAT_EstatusActivo.Descripcion == "En Almacén");
@@ -29,14 +29,15 @@ namespace ActivosFijos.Controllers
             int anioSeguimiento = DateTime.Now.Year;
 
             if (iPaginaSinInventario < 1) iPaginaSinInventario = 1;
-            var pageSizesSinInventario = new[] { 10, 25, 50, 100 };
-            if (!pageSizesSinInventario.Contains(iPerPageSinInventario)) iPerPageSinInventario = 25;
-
-            ViewBag.BusquedaSinInventario = busquedaSinInventario;
+            if (iPerPageSinInventario < 1) iPerPageSinInventario = 25;
+            ViewBag.NumeroEmpleadoSinInventario = numeroEmpleadoSinInventario;
+            ViewBag.NombreCompletoSinInventario = nombreCompletoSinInventario;
             ViewBag.CorporacionSinInventario = corporacionSinInventario;
+            ViewBag.AreaSinInventario = areaSinInventario;
+            ViewBag.PuestoFuncionalSinInventario = puestoFuncionalSinInventario;
+            ViewBag.MunicipioSinInventario = municipioSinInventario;
             ViewBag.PaginaSinInventario = iPaginaSinInventario;
             ViewBag.PerPageSinInventario = iPerPageSinInventario;
-            ViewBag.PageSizesSinInventario = pageSizesSinInventario;
 
             // Pasar los datos al modelo de la vista
             var model = new DashboardViewModel
@@ -47,8 +48,13 @@ namespace ActivosFijos.Controllers
                 TotalActivos = totalActivos,
                 AnioSeguimiento = anioSeguimiento,
                 SeguimientoTrimestral = ObtenerSeguimientoTrimestral(anioSeguimiento),
-                EmpleadosSinInventarioHistorico = ObtenerEmpleadosSinInventarioHistorico(busquedaSinInventario, corporacionSinInventario, iPaginaSinInventario, iPerPageSinInventario)
+                EmpleadosSinInventarioHistorico = ObtenerEmpleadosSinInventarioHistorico(numeroEmpleadoSinInventario, nombreCompletoSinInventario, corporacionSinInventario, areaSinInventario, puestoFuncionalSinInventario, municipioSinInventario, iPaginaSinInventario, iPerPageSinInventario)
             };
+
+            if (Request.IsAjaxRequest())
+            {
+                return PartialView("_EmpleadosSinInventarioHistorico", model.EmpleadosSinInventarioHistorico);
+            }
 
             return View(model);
         }
@@ -203,10 +209,14 @@ namespace ActivosFijos.Controllers
             return activosUnicosInventariados == 0 ? "Sin actividad" : "No cumple";
         }
 
-        private IPagedList<EmpleadoSinInventarioHistoricoViewModel> ObtenerEmpleadosSinInventarioHistorico(string busqueda, string corporacion, int iPagina, int iPerPage)
+        private IPagedList<EmpleadoSinInventarioHistoricoViewModel> ObtenerEmpleadosSinInventarioHistorico(string numeroEmpleado, string nombreCompleto, string corporacion, string area, string puestoFuncional, string municipio, int iPagina, int iPerPage)
         {
-            busqueda = (busqueda ?? string.Empty).Trim();
+            numeroEmpleado = (numeroEmpleado ?? string.Empty).Trim();
+            nombreCompleto = (nombreCompleto ?? string.Empty).Trim();
             corporacion = (corporacion ?? string.Empty).Trim();
+            area = (area ?? string.Empty).Trim();
+            puestoFuncional = (puestoFuncional ?? string.Empty).Trim();
+            municipio = (municipio ?? string.Empty).Trim();
 
             var empleadosBase = from activo in _db.PLU_OP_Activos.AsNoTracking()
                                 join resguardo in _db.PLU_OP_Resguardo.AsNoTracking()
@@ -280,18 +290,34 @@ namespace ActivosFijos.Controllers
                 Estatus = "Sin inventario histórico"
             });
 
-            if (!string.IsNullOrWhiteSpace(busqueda))
+            if (!string.IsNullOrWhiteSpace(numeroEmpleado))
             {
-                consulta = consulta.Where(e => e.NumeroEmpleado.Contains(busqueda)
-                    || e.NombreCompleto.Contains(busqueda)
-                    || e.Corporacion.Contains(busqueda)
-                    || e.Area.Contains(busqueda)
-                    || e.PuestoFuncional.Contains(busqueda));
+                consulta = consulta.Where(e => e.NumeroEmpleado.Contains(numeroEmpleado));
+            }
+
+            if (!string.IsNullOrWhiteSpace(nombreCompleto))
+            {
+                consulta = consulta.Where(e => e.NombreCompleto.Contains(nombreCompleto));
             }
 
             if (!string.IsNullOrWhiteSpace(corporacion))
             {
                 consulta = consulta.Where(e => e.Corporacion.Contains(corporacion));
+            }
+
+            if (!string.IsNullOrWhiteSpace(area))
+            {
+                consulta = consulta.Where(e => e.Area.Contains(area));
+            }
+
+            if (!string.IsNullOrWhiteSpace(puestoFuncional))
+            {
+                consulta = consulta.Where(e => e.PuestoFuncional.Contains(puestoFuncional));
+            }
+
+            if (!string.IsNullOrWhiteSpace(municipio))
+            {
+                consulta = consulta.Where(e => e.Municipio.Contains(municipio));
             }
 
             return consulta

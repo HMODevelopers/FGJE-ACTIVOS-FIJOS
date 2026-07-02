@@ -653,6 +653,8 @@
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Home\_EmpleadosSinInventarioHistorico.cshtml" />
+    <Content Include="Views\Home\_FiltrosEmpleadosSinInventarioHistorico.cshtml" />
     <Content Include="Views\Shared\footer.cshtml" />
     <Content Include="Views\Shared\left_sidebar.cshtml" />
     <Content Include="Views\Shared\right_sidebar.cshtml" />

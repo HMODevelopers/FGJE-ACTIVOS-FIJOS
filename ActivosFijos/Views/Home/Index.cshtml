@@ -266,95 +266,11 @@
                 <h4 class="header-title mb-2">Empleados con activos sin inventario histórico</h4>
                 <p class="text-muted font-13 mb-4">Esta tabla muestra empleados/resguardantes activos con activos actuales en resguardo y sin registros históricos de inventario físico por número de empleado.</p>
 
-                @using (Html.BeginForm("Index", "Home", FormMethod.Get))
-                {
-                    <div class="row mb-3">
-                        <div class="col-md-5">
-                            <div class="form-group">
-                                <label for="busquedaSinInventario" class="control-label">Búsqueda</label>
-                                <div class="input-group">
-                                    @Html.TextBox("busquedaSinInventario", ViewBag.BusquedaSinInventario as string, new { @class = "form-control", placeholder = "Número, nombre, corporación, área o puesto" })
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="corporacionSinInventario" class="control-label">Corporación</label>
-                                @Html.TextBox("corporacionSinInventario", ViewBag.CorporacionSinInventario as string, new { @class = "form-control", placeholder = "Filtrar por corporación" })
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="form-group">
-                                <label for="iPerPageSinInventario" class="control-label">Registros</label>
-                                @Html.DropDownList("iPerPageSinInventario", new SelectList(ViewBag.PageSizesSinInventario, ViewBag.PerPageSinInventario), new { @class = "form-control" })
-                            </div>
-                        </div>
-                        <div class="col-md-1 d-flex align-items-end">
-                            <button type="submit" class="btn btn-primary btn-block mb-3">Buscar</button>
-                        </div>
-                    </div>
-                }
+                @Html.Partial("_FiltrosEmpleadosSinInventarioHistorico")
 
-                <div class="table-responsive">
-                    <table class="table table-striped table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Número empleado</th>
-                                <th>Nombre completo</th>
-                                <th>Corporación</th>
-                                <th>Área</th>
-                                <th>Puesto funcional</th>
-                                <th>Municipio</th>
-                                <th>Activos asignados</th>
-                                <th>Resguardos</th>
-                                <th>Fecha primer activo asignado</th>
-                                <th>Estatus</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if (Model.EmpleadosSinInventarioHistorico != null && Model.EmpleadosSinInventarioHistorico.Any())
-                            {
-                                foreach (var empleado in Model.EmpleadosSinInventarioHistorico)
-                                {
-                                    <tr>
-                                        <td>@empleado.NumeroEmpleado</td>
-                                        <td>@empleado.NombreCompleto</td>
-                                        <td>@(string.IsNullOrWhiteSpace(empleado.Corporacion) ? "Sin adscripción" : empleado.Corporacion)</td>
-                                        <td>@(string.IsNullOrWhiteSpace(empleado.Area) ? "Sin adscripción" : empleado.Area)</td>
-                                        <td>@(string.IsNullOrWhiteSpace(empleado.PuestoFuncional) ? "Sin dato" : empleado.PuestoFuncional)</td>
-                                        <td>@(string.IsNullOrWhiteSpace(empleado.Municipio) ? "Sin dato" : empleado.Municipio)</td>
-                                        <td>@empleado.TotalActivosAsignados</td>
-                                        <td>@empleado.TotalResguardos</td>
-                                        <td>@(empleado.FechaPrimerActivoAsignado.HasValue ? empleado.FechaPrimerActivoAsignado.Value.ToString("dd/MM/yyyy") : "Sin fecha")</td>
-                                        <td><span class="badge badge-danger">@empleado.Estatus</span></td>
-                                    </tr>
-                                }
-                            }
-                            else
-                            {
-                                <tr>
-                                    <td colspan="10" class="text-center text-muted">No se encontraron empleados con activos sin inventario histórico.</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
+                <div id="resultadosBusquedaSinInventario">
+                    @Html.Partial("_EmpleadosSinInventarioHistorico", Model.EmpleadosSinInventarioHistorico)
                 </div>
-
-                @if (Model.EmpleadosSinInventarioHistorico != null)
-                {
-                    <div class="container-fluid">
-                        <div class="row mt-3">
-                            <div class="col-sm-8 col-12">
-                                <span>Empleados del <strong>@(Model.EmpleadosSinInventarioHistorico.LastItemOnPage > 0 ? Model.EmpleadosSinInventarioHistorico.FirstItemOnPage : 0)</strong> al <strong>@Model.EmpleadosSinInventarioHistorico.LastItemOnPage</strong> de <strong>@Model.EmpleadosSinInventarioHistorico.TotalItemCount</strong> Registros</span>
-                            </div>
-                            <div class="col-sm-12 col-12 text-right">
-                                <div id="pagedList" class="pagedList">
-                                    @Html.PagedListPager(Model.EmpleadosSinInventarioHistorico, iPaginaSinInventario => Url.Action("Index", new { iPaginaSinInventario, iPerPageSinInventario = ViewBag.PerPageSinInventario, busquedaSinInventario = ViewBag.BusquedaSinInventario, corporacionSinInventario = ViewBag.CorporacionSinInventario }), PagedList.Mvc.PagedListRenderOptions.ClassicPlusFirstAndLast)
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                }
             </div>
         </div>
     </div>
@@ -362,6 +278,8 @@
 
 @section Scripts {
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ajax-unobtrusive/3.2.6/jquery.unobtrusive-ajax.min.js"></script>
+    <script src="~/Content/assets/js/pages/Filtros.js"></script>
 
     <script>
 
