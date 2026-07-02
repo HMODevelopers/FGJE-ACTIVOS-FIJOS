@@ -21,12 +21,22 @@ namespace ActivosFijos.Models.ViewModels
         public int Trimestre { get; set; }
         public string NombreTrimestre { get; set; }
         public string Periodo { get; set; }
-        public int TotalInventariosRealizados { get; set; }
-        public int ActivosInventariadosUnicos { get; set; }
+        public int Meta { get; set; }
+        public int InventariosRealizados { get; set; }
+        public int ActivosUnicosInventariados { get; set; }
         public int EmpleadosVisitados { get; set; }
-        public int ActivosEsperados { get; set; }
         public decimal PorcentajeAvance { get; set; }
-        public string Estatus { get; set; }
+        public int Diferencia { get; set; }
+        public string Cumplimiento { get; set; }
+        public bool CumpleMeta { get; set; }
+    }
+
+    public class MetaTrimestralInventario
+    {
+        public int Trimestre { get; set; }
+        public string Nombre { get; set; }
+        public string Periodo { get; set; }
+        public int Meta { get; set; }
     }
 
     public class EmpleadoSinInventarioHistoricoViewModel

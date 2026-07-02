@@ -44,10 +44,8 @@ namespace ActivosFijos.Controllers
         {
             var inicioAnio = new DateTime(anio, 1, 1);
             var finAnio = inicioAnio.AddYears(1);
-            var trimestreActual = DateTime.Now.Year == anio ? ((DateTime.Now.Month - 1) / 3) + 1 : 0;
-            var activosEsperados = _db.PLU_OP_Activos
-                .AsNoTracking()
-                .Count(a => a.Activo && a.IdEstatusActivo == 2 && a.IdResguardo != null);
+            var anioActual = DateTime.Now.Year;
+            var trimestreActual = anioActual == anio ? ((DateTime.Now.Month - 1) / 3) + 1 : 0;
 
             var inventariosPorTrimestre = _db.PLU_OP_InventarioFisico
                 .AsNoTracking()
@@ -56,79 +54,80 @@ namespace ActivosFijos.Controllers
                 .Select(g => new
                 {
                     Trimestre = g.Key,
-                    TotalInventariosRealizados = g.Count(),
-                    ActivosInventariadosUnicos = g.Select(i => i.IdActivo).Distinct().Count()
+                    InventariosRealizados = g.Count(),
+                    ActivosUnicosInventariados = g.Select(i => i.IdActivo).Distinct().Count(),
+                    EmpleadosVisitados = g.Where(i => i.NumeroEmpleado > 0)
+                        .Select(i => i.NumeroEmpleado)
+                        .Distinct()
+                        .Count()
                 })
                 .ToList();
 
-            var empleadosVisitadosPorTrimestre = (from inventario in _db.PLU_OP_InventarioFisico.AsNoTracking()
-                                                   join activo in _db.PLU_OP_Activos.AsNoTracking() on inventario.IdActivo equals activo.IdActivos
-                                                   join resguardo in _db.PLU_OP_Resguardo.AsNoTracking() on activo.IdResguardo equals (int?)resguardo.IdResguardo
-                                                   where inventario.Activo
-                                                       && inventario.FechaInventario >= inicioAnio
-                                                       && inventario.FechaInventario < finAnio
-                                                       && activo.IdResguardo != null
-                                                   group resguardo by ((inventario.FechaInventario.Month - 1) / 3) + 1 into trimestre
-                                                   select new
-                                                   {
-                                                       Trimestre = trimestre.Key,
-                                                       EmpleadosVisitados = trimestre.Select(r => r.IdEmpleado).Distinct().Count()
-                                                   })
-                .ToList();
-
-            var trimestres = new[]
+            return ObtenerMetasTrimestralesInventario().Select(metaTrimestral =>
             {
-                new { Numero = 1, Nombre = "T1", Periodo = "Enero - Marzo" },
-                new { Numero = 2, Nombre = "T2", Periodo = "Abril - Junio" },
-                new { Numero = 3, Nombre = "T3", Periodo = "Julio - Septiembre" },
-                new { Numero = 4, Nombre = "T4", Periodo = "Octubre - Diciembre" }
-            };
-
-            return trimestres.Select(t =>
-            {
-                var inventario = inventariosPorTrimestre.FirstOrDefault(i => i.Trimestre == t.Numero);
-                var empleados = empleadosVisitadosPorTrimestre.FirstOrDefault(e => e.Trimestre == t.Numero);
-                var activosInventariados = inventario != null ? inventario.ActivosInventariadosUnicos : 0;
-                var porcentaje = activosEsperados == 0 ? 0 : Math.Round((decimal)activosInventariados * 100 / activosEsperados, 2);
+                var inventario = inventariosPorTrimestre.FirstOrDefault(i => i.Trimestre == metaTrimestral.Trimestre);
+                var activosUnicosInventariados = inventario != null ? inventario.ActivosUnicosInventariados : 0;
+                var porcentajeAvance = metaTrimestral.Meta == 0
+                    ? 0
+                    : Math.Round((decimal)activosUnicosInventariados * 100 / metaTrimestral.Meta, 2);
+                var diferencia = activosUnicosInventariados - metaTrimestral.Meta;
 
                 return new DashboardTrimestreViewModel
                 {
-                    Trimestre = t.Numero,
-                    NombreTrimestre = t.Nombre,
-                    Periodo = t.Periodo,
-                    TotalInventariosRealizados = inventario != null ? inventario.TotalInventariosRealizados : 0,
-                    ActivosInventariadosUnicos = activosInventariados,
-                    EmpleadosVisitados = empleados != null ? empleados.EmpleadosVisitados : 0,
-                    ActivosEsperados = activosEsperados,
-                    PorcentajeAvance = porcentaje,
-                    Estatus = ObtenerEstatusTrimestre(porcentaje, t.Numero, trimestreActual)
+                    Trimestre = metaTrimestral.Trimestre,
+                    NombreTrimestre = metaTrimestral.Nombre,
+                    Periodo = metaTrimestral.Periodo,
+                    Meta = metaTrimestral.Meta,
+                    InventariosRealizados = inventario != null ? inventario.InventariosRealizados : 0,
+                    ActivosUnicosInventariados = activosUnicosInventariados,
+                    EmpleadosVisitados = inventario != null ? inventario.EmpleadosVisitados : 0,
+                    PorcentajeAvance = porcentajeAvance,
+                    Diferencia = diferencia,
+                    CumpleMeta = activosUnicosInventariados >= metaTrimestral.Meta,
+                    Cumplimiento = ObtenerCumplimientoTrimestre(activosUnicosInventariados, metaTrimestral.Meta, metaTrimestral.Trimestre, anio, anioActual, trimestreActual)
                 };
             }).ToList();
         }
 
-        private string ObtenerEstatusTrimestre(decimal porcentajeAvance, int trimestre, int trimestreActual)
+        private List<MetaTrimestralInventario> ObtenerMetasTrimestralesInventario()
         {
-            if (porcentajeAvance == 0)
+            return new List<MetaTrimestralInventario>
             {
-                return "Sin iniciar";
+                new MetaTrimestralInventario { Trimestre = 1, Nombre = "T1", Periodo = "Enero - Marzo", Meta = 7359 },
+                new MetaTrimestralInventario { Trimestre = 2, Nombre = "T2", Periodo = "Abril - Junio", Meta = 11038 },
+                new MetaTrimestralInventario { Trimestre = 3, Nombre = "T3", Periodo = "Julio - Septiembre", Meta = 11038 },
+                new MetaTrimestralInventario { Trimestre = 4, Nombre = "T4", Periodo = "Octubre - Diciembre", Meta = 7359 }
+            };
+        }
+
+        private string ObtenerCumplimientoTrimestre(int activosUnicosInventariados, int meta, int trimestre, int anio, int anioActual, int trimestreActual)
+        {
+            if (activosUnicosInventariados >= meta)
+            {
+                return "Cumple";
             }
 
-            if (porcentajeAvance >= 100)
+            if (anio > anioActual)
             {
-                return "Completo";
+                return activosUnicosInventariados == 0 ? "Pendiente de iniciar" : "En proceso";
             }
 
-            if (trimestreActual > 0 && trimestre < trimestreActual)
+            if (anio < anioActual)
             {
-                return "Con pendientes";
+                return activosUnicosInventariados == 0 ? "Sin actividad" : "No cumple";
             }
 
-            if (trimestreActual == 0 || trimestre == trimestreActual)
+            if (trimestre > trimestreActual)
             {
-                return "En proceso";
+                return activosUnicosInventariados == 0 ? "Pendiente de iniciar" : "En proceso";
             }
 
-            return "Sin iniciar";
+            if (trimestre == trimestreActual)
+            {
+                return activosUnicosInventariados == 0 ? "Sin actividad" : "En proceso";
+            }
+
+            return activosUnicosInventariados == 0 ? "Sin actividad" : "No cumple";
         }
 
         private List<EmpleadoSinInventarioHistoricoViewModel> ObtenerEmpleadosSinInventarioHistorico()

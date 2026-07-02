@@ -184,7 +184,7 @@
         <div class="card">
             <div class="card-body">
                 <h4 class="header-title mb-3">Seguimiento trimestral de inventarios (@Model.AnioSeguimiento)</h4>
-                <h5 class="font-15 mb-3">Avance por trimestre</h5>
+                <h5 class="font-15 mb-3">Cumplimiento de metas trimestrales</h5>
 
                 <div class="table-responsive">
                     <table class="table table-striped table-bordered">
@@ -192,12 +192,13 @@
                             <tr>
                                 <th>Trimestre</th>
                                 <th>Periodo</th>
-                                <th>Inventarios</th>
-                                <th>Activos inventariados</th>
+                                <th>Meta</th>
+                                <th>Inventarios realizados</th>
+                                <th>Activos únicos inventariados</th>
                                 <th>Empleados visitados</th>
-                                <th>Activos esperados</th>
                                 <th style="min-width: 180px;">Avance</th>
-                                <th>Estatus</th>
+                                <th>Diferencia</th>
+                                <th>Cumplimiento</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -206,42 +207,50 @@
                                 foreach (var trimestre in Model.SeguimientoTrimestral)
                                 {
                                     var badgeClass = "badge-secondary";
-                                    if (trimestre.Estatus == "Completo")
+                                    if (trimestre.Cumplimiento == "Cumple")
                                     {
                                         badgeClass = "badge-success";
                                     }
-                                    else if (trimestre.Estatus == "En proceso")
+                                    else if (trimestre.Cumplimiento == "No cumple")
+                                    {
+                                        badgeClass = "badge-danger";
+                                    }
+                                    else if (trimestre.Cumplimiento == "En proceso")
                                     {
                                         badgeClass = "badge-info";
                                     }
-                                    else if (trimestre.Estatus == "Con pendientes")
-                                    {
-                                        badgeClass = "badge-warning";
-                                    }
+
+                                    var diferencia = trimestre.Diferencia > 0
+                                        ? "+" + trimestre.Diferencia.ToString("N0")
+                                        : trimestre.Diferencia.ToString("N0");
+                                    var diferenciaClass = trimestre.Diferencia > 0
+                                        ? "text-success"
+                                        : trimestre.Diferencia < 0 ? "text-danger" : "text-muted";
 
                                     <tr>
                                         <td>@trimestre.NombreTrimestre</td>
                                         <td>@trimestre.Periodo</td>
-                                        <td>@trimestre.TotalInventariosRealizados</td>
-                                        <td>@trimestre.ActivosInventariadosUnicos</td>
-                                        <td>@trimestre.EmpleadosVisitados</td>
-                                        <td>@trimestre.ActivosEsperados</td>
+                                        <td>@trimestre.Meta.ToString("N0")</td>
+                                        <td>@trimestre.InventariosRealizados.ToString("N0")</td>
+                                        <td>@trimestre.ActivosUnicosInventariados.ToString("N0")</td>
+                                        <td>@trimestre.EmpleadosVisitados.ToString("N0")</td>
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                <span class="mr-2">@trimestre.PorcentajeAvance.ToString("0.##")%</span>
+                                                <span class="mr-2">@trimestre.PorcentajeAvance.ToString("N2")%</span>
                                                 <div class="progress flex-grow-1" style="height: 6px;">
-                                                    <div class="progress-bar" role="progressbar" style="width: @Math.Min(trimestre.PorcentajeAvance, 100).ToString(System.Globalization.CultureInfo.InvariantCulture)%" aria-valuenow="@trimestre.PorcentajeAvance.ToString(System.Globalization.CultureInfo.InvariantCulture)" aria-valuemin="0" aria-valuemax="100"></div>
+                                                    <div class="progress-bar" role="progressbar" style="width: @Math.Min(trimestre.PorcentajeAvance, 100).ToString(System.Globalization.CultureInfo.InvariantCulture)%" aria-valuenow="@Math.Min(trimestre.PorcentajeAvance, 100).ToString(System.Globalization.CultureInfo.InvariantCulture)" aria-valuemin="0" aria-valuemax="100"></div>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td><span class="badge @badgeClass">@trimestre.Estatus</span></td>
+                                        <td><span class="@diferenciaClass">@diferencia</span></td>
+                                        <td><span class="badge @badgeClass">@trimestre.Cumplimiento</span></td>
                                     </tr>
                                 }
                             }
                             else
                             {
                                 <tr>
-                                    <td colspan="8" class="text-center text-muted">No hay información de seguimiento trimestral.</td>
+                                    <td colspan="9" class="text-center text-muted">No hay información de seguimiento trimestral.</td>
                                 </tr>
                             }
                         </tbody>
