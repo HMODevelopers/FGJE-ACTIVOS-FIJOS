@@ -1,141 +1,167 @@
-# FGJE Activos Fijos
+# Sistema de Activos Fijos · FGJE
 
-## A) Visión general
+Aplicación web para la administración integral de los activos fijos de la Fiscalía General de Justicia del Estado (FGJE). Centraliza el registro de bienes, su asignación a personal, el control de resguardos, los inventarios físicos y las bajas, manteniendo trazabilidad sobre cada movimiento.
 
-**FGJE Activos Fijos** es un sistema de inventarios para la gestión de activos fijos. La solución incluye un único proyecto web ASP.NET MVC (`ActivosFijos`) dentro de la solución `ActivosFijos.sln`.【F:ActivosFijos.sln†L1-L8】
+## Propósito del sistema
 
-**Características principales (según módulos implementados):**
-- Administración de activos (altas, bajas, cambios, resguardos e inventario físico).【F:ActivosFijos/ActivosFijos.csproj†L121-L156】
-- Catálogos base: categorías, conceptos, marcas, proveedores, almacenes, estados físicos y estatus de activos.【F:ActivosFijos/ActivosFijos.csproj†L109-L121】
-- Administración de usuarios, roles, menús, submenús y permisos de acceso.【F:ActivosFijos/ActivosFijos.csproj†L116-L129】
-- Reportes y actividades de usuarios.【F:ActivosFijos/ActivosFijos.csproj†L120-L128】
+La aplicación apoya el control administrativo y patrimonial de los bienes institucionales. Su objetivo es que las áreas responsables puedan conocer, en todo momento, qué activos existen, dónde se encuentran, quién los tiene bajo resguardo y cuál es su condición.
 
-> **Nota:** No se incluyen capturas porque el repositorio no las contiene.
+El sistema acompaña el ciclo de vida de un activo:
 
-## B) Stack
-
-- **ASP.NET MVC 5.2.9** (paquetes `Microsoft.AspNet.Mvc`, `Razor`, `WebPages`).【F:ActivosFijos/packages.config†L11-L24】
-- **.NET Framework 4.7.2** (`TargetFrameworkVersion` del proyecto).【F:ActivosFijos/ActivosFijos.csproj†L20-L27】
-- **Entity Framework 6.4.4**.【F:ActivosFijos/packages.config†L5-L8】
-- **Base de datos SQL Server** (`System.Data.SqlClient` en la cadena de conexión).【F:ActivosFijos/Web.config†L66-L69】
-- **Librerías clave**:
-  - EPPlus (exportación Excel).【F:ActivosFijos/packages.config†L7-L9】
-  - iTextSharp (PDF).【F:ActivosFijos/packages.config†L10-L11】
-  - QRCoder (QR).【F:ActivosFijos/packages.config†L25-L26】
-  - Bootstrap 5.2.3 y jQuery 3.4.1 (UI).【F:ActivosFijos/packages.config†L3-L12】
-  - PagedList MVC (paginación).【F:ActivosFijos/packages.config†L24-L25】
-
-## C) Requisitos
-
-- **Visual Studio 2022** o superior con carga de trabajo de ASP.NET y desarrollo web (la solución declara VS 17).【F:ActivosFijos.sln†L1-L5】
-- **.NET Framework 4.7.2** instalado en el equipo de desarrollo.【F:ActivosFijos/ActivosFijos.csproj†L20-L27】
-- **SQL Server** (local o remoto) para la base de datos de inventarios.【F:ActivosFijos/Web.config†L66-L69】
-- **IIS Express** para desarrollo (configurado en el proyecto).【F:ActivosFijos/ActivosFijos.csproj†L26-L33】
-
-## D) Configuración de entorno
-
-- El archivo principal es `ActivosFijos/Web.config`, donde vive la cadena de conexión `ModelContext`.【F:ActivosFijos/Web.config†L1-L69】
-- Existen transformaciones `Web.Debug.config` y `Web.Release.config` para ajustar settings por ambiente.【F:ActivosFijos/Web.Debug.config†L1-L27】【F:ActivosFijos/Web.Release.config†L1-L19】
-- **Cadena de conexión**:
-  - **Nombre:** `ModelContext`.
-  - **Proveedor:** `System.Data.SqlClient`.
-  - **Ejemplo seguro:** ver [`docs/CONFIGURACION.md`](docs/CONFIGURACION.md).【F:docs/CONFIGURACION.md†L1-L21】
-- **Variables sensibles:** credenciales SQL no deben ser versionadas (en el repo hay un ejemplo que debe reemplazarse localmente).【F:ActivosFijos/Web.config†L66-L69】
-
-## E) Base de datos (Entity Framework)
-
-- El proyecto usa **Entity Framework 6** con un `DbContext` llamado `ModelContext`.【F:ActivosFijos/Models/ModelContext.cs†L7-L19】
-- **No se encontraron migraciones ni archivo `.edmx`** en el repositorio, por lo que la base debe existir previamente y corresponder al modelo de entidades en `Models/`.【F:ActivosFijos/Models/ModelContext.cs†L7-L54】
-
-### Escenario actual (sin migraciones)
-
-1. Crear la base de datos en SQL Server.
-2. Ajustar la cadena de conexión `ModelContext` en `Web.config`.
-3. Validar que las tablas existentes coincidan con las entidades del proyecto (prefijos `PLU_*`).【F:ActivosFijos/Models/ModelContext.cs†L7-L54】
-
-### Recomendaciones
-
-- Si se desea usar migraciones Code First, habilitarlo con `Enable-Migrations` en la Package Manager Console y generar una migración inicial.
-- Documentar scripts SQL o un `edmx` si se trabaja en modo Database First.
-
-## F) Cómo correr (desarrollo)
-
-1. Abrir `ActivosFijos.sln` en Visual Studio.【F:ActivosFijos.sln†L1-L8】
-2. Restaurar paquetes NuGet (`packages.config`).【F:ActivosFijos/packages.config†L1-L35】
-3. Establecer `ActivosFijos` como **Startup Project**.
-4. Compilar la solución.
-5. Ejecutar con IIS Express. El proyecto define la URL local en `https://localhost:44312/`.【F:ActivosFijos/ActivosFijos.csproj†L760-L768】
-
-> **Credenciales:** No se encontraron usuarios/credenciales por defecto en el código; la autenticación se basa en registros de la tabla `PLU_CONF_Usuario` y contraseñas hasheadas con SHA-256.【F:ActivosFijos/Helpers/AuthHelper.cs†L13-L42】【F:ActivosFijos/Helpers/HashHelper.cs†L49-L60】
-
-## G) Cómo desplegar (producción)
-
-Escenario típico en IIS:
-
-1. Publicar el proyecto desde Visual Studio (carpeta o perfil IIS).
-2. Configurar un **Application Pool** con **.NET CLR v4.0** y pipeline **Integrated**.
-3. Ajustar `Web.config` en el servidor con la cadena de conexión real.
-4. Otorgar permisos a carpetas de uploads si se usan (por ejemplo, `Content/FotosActivos`, `Content/Oficios*`).【F:ActivosFijos/ActivosFijos.csproj†L636-L646】
-
-No se encontraron perfiles de publicación (`.pubxml`) en el repositorio.
-
-## H) Estructura del proyecto
-
+```text
+Alta del activo → Identificación y etiquetado → Asignación / resguardo
+       → Inventario físico → Cambio de responsable o ubicación → Baja definitiva
 ```
+
+## Funcionalidades destacadas
+
+- Registro individual y carga masiva de activos desde Excel.
+- Administración de fotografías y documentos relacionados con los bienes.
+- Impresión de etiquetas de inventario y códigos QR.
+- Generación de resguardos, inventarios y otros documentos en PDF.
+- Control de altas, cambios de responsable y bajas definitivas.
+- Consulta de inventarios físicos y detalle de activos inventariados.
+- Exportación de reportes a Excel.
+- Acceso controlado por usuario, rol y permisos de menú.
+
+## Módulos principales
+
+| Módulo | ¿Qué permite hacer? |
+| --- | --- |
+| **Inicio** | Consultar indicadores de operaciones e inventarios agrupados por mes y por usuario. |
+| **Activos** | Dar de alta, editar y consultar bienes; administrar fotografías, cargar activos de forma masiva, imprimir etiquetas, registrar bajas y exportar su información a Excel. |
+| **Resguardos** | Asignar activos a empleados, registrar altas y cambios de resguardo, consultar movimientos y generar documentos PDF. |
+| **Inventario físico** | Crear y consultar levantamientos de inventario, buscar activos, revisar el detalle de cada inventario y generar sus reportes PDF. |
+| **Empleados y adscripción** | Administrar empleados, consultar y actualizar su adscripción, además de imprimir sus resguardos. |
+| **Catálogos** | Mantener la información de apoyo: almacenes, áreas y unidades administrativas, categorías, clasificadores, conceptos, marcas, proveedores, facturas, estado físico y estatus del activo. |
+| **Usuarios y seguridad** | Gestionar usuarios, perfiles, cambio o restablecimiento de contraseña, roles, menús, submenús y permisos. |
+| **Reportes** | Consultar la actividad de usuarios y descargar reportes generales de activos, inventario y actividad en formato Excel. |
+
+## Tecnologías utilizadas
+
+| Capa | Tecnología |
+| --- | --- |
+| Aplicación web | ASP.NET MVC 5.2.9 sobre .NET Framework 4.7.2 |
+| Lenguaje y vistas | C#, Razor, HTML, CSS y JavaScript |
+| Datos | Entity Framework 6.4.4 y SQL Server |
+| Interfaz | Bootstrap 5.2.3 y jQuery 3.4.1 |
+| Archivos y documentos | EPPlus para Excel, iTextSharp para PDF y QRCoder para códigos QR |
+| Utilidades | PagedList MVC, Newtonsoft.Json y validación jQuery |
+
+## Arquitectura y estructura
+
+Se trata de una aplicación MVC tradicional: los controladores atienden las solicitudes, los modelos representan los datos y las vistas Razor renderizan la interfaz. Entity Framework se conecta a SQL Server mediante el contexto `ModelContext`.
+
+```text
 ActivosFijos/
-├─ App_Start/        # BundleConfig, FilterConfig, RouteConfig, WebApiConfig
-├─ Controllers/      # Controladores MVC (módulos funcionales)
-├─ Models/           # DbContext + entidades EF
-├─ Models/ViewModels # ViewModels
-├─ Views/            # Vistas Razor
-├─ Helpers/          # Utilidades (auth, hash, sesiones, etc.)
-├─ Filters/          # Filtros de autenticación
-├─ Content/          # CSS, assets, archivos adjuntos
-└─ Scripts/          # JS y librerías
+├── App_Start/       Configuración de rutas, filtros, Web API y bundles
+├── Controllers/     Controladores de cada módulo funcional
+├── Models/          Entidades, ModelContext y modelos de vista
+├── Migrations/      Migraciones de Entity Framework
+├── Services/Pdf/    Constructores de documentos PDF
+├── Views/           Vistas Razor organizadas por módulo
+├── Content/         Estilos, imágenes, plantillas y archivos adjuntos
+├── Scripts/         JavaScript y librerías del lado cliente
+├── Helpers/         Utilidades de sesión, autenticación y hash
+└── Filters/         Filtros de autorización y acceso
 ```
 
-Referencias:
-- `App_Start` contiene la configuración de rutas, bundles y Web API.【F:ActivosFijos/App_Start/RouteConfig.cs†L8-L19】【F:ActivosFijos/App_Start/BundleConfig.cs†L8-L28】【F:ActivosFijos/App_Start/WebApiConfig.cs†L8-L24】
-- `Models` expone `ModelContext` y las entidades EF.【F:ActivosFijos/Models/ModelContext.cs†L7-L54】
-- `Filters` incluye filtros de autenticación para login y sesiones.【F:ActivosFijos/Filters/AdminFilters.cs†L8-L44】
+## Requisitos de desarrollo
 
-## I) Módulos funcionales
+- Visual Studio 2022 o superior, con la carga de trabajo de ASP.NET y desarrollo web.
+- .NET Framework 4.7.2 instalado.
+- SQL Server local o remoto, con acceso a la base de datos del sistema.
+- IIS Express para desarrollo; para ambientes publicados se requiere IIS.
 
-Basado en los controladores existentes:
+## Configuración local
 
-- **Autenticación:** `AuthController` (login y logout).【F:ActivosFijos/ActivosFijos.csproj†L114-L118】
-- **Activos y resguardos:** `ActivosController`, `ResguardosController` y `InventarioController`.【F:ActivosFijos/ActivosFijos.csproj†L109-L122】
-- **Catálogos:** `Almacenes`, `AreasUnidadesAdmin`, `Categorias`, `Clasificadores`, `Conceptos`, `EstadoFisico`, `EstatusActivo`, `Facturas`, `Marcas`, `Proveedores`.【F:ActivosFijos/ActivosFijos.csproj†L109-L121】
-- **Administración y seguridad:** `Usuarios`, `Roles`, `Permisos`, `Menu`, `SubMenu`.【F:ActivosFijos/ActivosFijos.csproj†L115-L129】
-- **Reportes:** `ReportesController`.【F:ActivosFijos/ActivosFijos.csproj†L121-L123】
+La aplicación utiliza una cadena de conexión llamada `ModelContext`, definida en `ActivosFijos/Web.config`. Antes de ejecutar el proyecto, reemplácela por los datos de su entorno local o de desarrollo.
 
-## J) Seguridad y roles
+```xml
+<connectionStrings>
+  <add name="ModelContext"
+       connectionString="Data Source=SERVIDOR_SQL;Initial Catalog=PLA_INVENTARIO;User ID=USUARIO_SQL;Password=CONTRASENA;TrustServerCertificate=True;MultipleActiveResultSets=True;App=EntityFramework"
+       providerName="System.Data.SqlClient" />
+</connectionStrings>
+```
 
-- **Autenticación:** Forms Authentication con cookie de sesión; redirección a `Auth/Index` cuando no hay sesión.【F:ActivosFijos/Web.config†L16-L23】【F:ActivosFijos/Filters/AdminFilters.cs†L10-L29】
-- **Gestión de sesión:** `SessionHelper` administra la cookie y obtiene el ID del usuario autenticado.【F:ActivosFijos/Helpers/SessionHelper.cs†L10-L66】
-- **Roles y permisos:** se basan en tablas `PLU_CAT_Roles` y `PLU_CONF_PermisosMenu`.【F:ActivosFijos/Models/PLU_CAT_Roles.cs†L1-L36】【F:ActivosFijos/Models/PLU_CONF_PermisosMenu.cs†L1-L36】
-- **Password hashing:** SHA-256 en `AuthHelper`/`HashHelper`.【F:ActivosFijos/Helpers/AuthHelper.cs†L13-L42】【F:ActivosFijos/Helpers/HashHelper.cs†L49-L60】
+> Nunca almacene credenciales reales en el repositorio. Para despliegues, use las transformaciones `Web.Debug.config` y `Web.Release.config`, o bien el mecanismo de secretos definido por su infraestructura.
 
-## K) Troubleshooting
+Para más información, consulte [Configuración local](docs/CONFIGURACION.md).
 
-- **Error de conexión a BD:** verificar que `ModelContext` apunte al servidor correcto y que el usuario tenga permisos en la BD.【F:ActivosFijos/Web.config†L66-L69】
-- **Credenciales inválidas:** las contraseñas se comparan con SHA-256; revisar valores de `PLU_CONF_Usuario.Pass`.【F:ActivosFijos/Helpers/AuthHelper.cs†L18-L36】【F:ActivosFijos/Helpers/HashHelper.cs†L49-L60】
-- **Paquetes faltantes:** restaurar NuGet cuando el build lo indique (referencias en `packages.config`).【F:ActivosFijos/packages.config†L1-L35】
-- **Errores sin logging estructurado:** actualmente se usa `Trace.TraceError` en autenticación; revisar output de logs de IIS/Trace si hay fallas de login.【F:ActivosFijos/Helpers/AuthHelper.cs†L35-L41】
+## Base de datos y migraciones
 
-## L) Contribución y convenciones
+- El acceso a datos se implementa con Entity Framework 6 mediante `ModelContext`.
+- El proyecto contiene migraciones de Entity Framework; actualmente incluye una migración para el campo `ForcePasswordChange` de usuarios.
+- La estructura base de la base de datos debe estar disponible antes de ejecutar la aplicación. Confirme que las tablas y procedimientos requeridos existan en el entorno SQL Server.
+- Antes de aplicar cambios en una base compartida, respalde la información y valide las migraciones en un entorno de pruebas.
 
-- No hay guías de contribución específicas en el repositorio. Se recomienda acordar convención de ramas/commits si el equipo lo requiere.
-- No se encontraron proyectos de pruebas automatizadas en la solución.
+## Cómo ejecutar el proyecto
 
-## M) Licencia
+1. Clone el repositorio y abra `ActivosFijos.sln` en Visual Studio.
+2. Restaure los paquetes NuGet de la solución.
+3. Ajuste la cadena de conexión `ModelContext` en `ActivosFijos/Web.config`.
+4. Establezca `ActivosFijos` como proyecto de inicio.
+5. Compile la solución para validar dependencias y configuración.
+6. Ejecute la aplicación con IIS Express.
 
-No se encontró archivo `LICENSE` en el repositorio.
+La URL configurada para desarrollo es `https://localhost:44312/`.
 
-## Hallazgos rápidos (stack/EF/BD/autenticación)
+## Autenticación y permisos
 
-- Proyecto ASP.NET MVC 5.2.9 sobre .NET Framework 4.7.2.【F:ActivosFijos/ActivosFijos.csproj†L20-L27】【F:ActivosFijos/packages.config†L11-L24】
-- Entity Framework 6.4.4 con `ModelContext` y entidades `PLU_*`; sin migraciones/EDMX detectados.【F:ActivosFijos/packages.config†L5-L8】【F:ActivosFijos/Models/ModelContext.cs†L7-L54】
-- Base de datos SQL Server definida por `ModelContext` en `Web.config`.【F:ActivosFijos/Web.config†L66-L69】
-- Autenticación basada en Forms Authentication con cookies y login en `Auth/Index`.【F:ActivosFijos/Web.config†L16-L23】【F:ActivosFijos/Filters/AdminFilters.cs†L10-L29】
-- Contraseñas hasheadas con SHA-256 (no hay credenciales hardcodeadas).【F:ActivosFijos/Helpers/AuthHelper.cs†L18-L36】【F:ActivosFijos/Helpers/HashHelper.cs†L49-L60】
+El acceso se basa en autenticación por formularios y sesiones. Una vez iniciada la sesión, el sistema identifica al usuario autenticado y aplica sus permisos según los roles, menús y submenús que tenga asignados.
+
+- El inicio de sesión se encuentra en `Auth/Index`.
+- La sesión de autenticación tiene una duración configurada de 60 minutos.
+- Los módulos protegidos utilizan filtros de acceso.
+- Las contraseñas se comparan mediante hash SHA-256.
+- El sistema contempla el cambio forzoso de contraseña para usuarios que lo requieran.
+
+Consulte el [flujo de contraseñas](docs/AUTH_PASSWORD_FLOW.md) para detalles del proceso.
+
+## Archivos generados y adjuntos
+
+La aplicación maneja archivos asociados a la operación, como fotografías de activos y oficios de resguardo o baja. En un despliegue en IIS, la identidad del Application Pool debe tener permisos de escritura sobre las carpetas de contenido utilizadas para esos adjuntos.
+
+Los documentos PDF se generan desde servicios especializados para resguardos, empleados e inventarios. Las exportaciones de Excel se producen desde los módulos de activos y reportes.
+
+## Despliegue en IIS
+
+1. Publique el proyecto desde Visual Studio a una carpeta o sitio IIS.
+2. Configure el Application Pool con **.NET CLR v4.0** y pipeline **Integrated**.
+3. Actualice la cadena de conexión para el servidor de producción mediante una transformación o configuración segura.
+4. Verifique los permisos de escritura para fotografías, oficios y otros adjuntos.
+5. Confirme que el servidor tenga acceso a SQL Server y que la base de datos esté preparada.
+6. Realice una prueba de inicio de sesión, consulta de activos y generación de documentos antes de liberar el sitio.
+
+## Solución de problemas frecuentes
+
+| Situación | Revisión recomendada |
+| --- | --- |
+| No es posible conectarse a la base de datos | Revise el servidor, nombre de base, credenciales y permisos de `ModelContext`. |
+| Faltan referencias al compilar | Restaure los paquetes NuGet y vuelva a compilar la solución. |
+| No se pueden cargar imágenes u oficios | Compruebe que las carpetas de destino existan y que IIS tenga permiso de escritura. |
+| Un usuario no puede acceder a un módulo | Verifique que tenga un rol y permisos asignados para el menú o submenú correspondiente. |
+| El inicio de sesión falla | Confirme que el usuario esté activo y que su contraseña coincida con el hash almacenado. |
+| No se generan PDFs o Excel | Verifique permisos de escritura, dependencias restauradas y la información requerida por el reporte. |
+
+## Documentación complementaria
+
+- [Configuración local](docs/CONFIGURACION.md)
+- [Flujo de contraseñas](docs/AUTH_PASSWORD_FLOW.md)
+- [Nota técnica: optimización de listado de cambios de resguardo](docs/NOTA_TECNICA_OPTIMIZACION_LISTARCAMBIOS.md)
+- [Script SQL de optimización](docs/sql/20260327_optimizacion_listar_cambios_resguardos.sql)
+
+## Consideraciones para contribución
+
+No hay una guía de contribución formal en el repositorio. Para cambios funcionales se recomienda:
+
+1. Trabajar en una rama independiente.
+2. Probar los flujos afectados con una base de datos de desarrollo.
+3. No incluir credenciales, archivos de usuarios ni datos sensibles.
+4. Documentar scripts SQL, cambios de configuración o migraciones requeridas.
+5. Validar la generación de PDFs, Excel y adjuntos cuando el cambio los involucre.
+
+## Licencia
+
+Este repositorio no incluye un archivo de licencia.
