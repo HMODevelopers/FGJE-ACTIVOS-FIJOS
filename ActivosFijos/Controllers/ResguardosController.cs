@@ -480,8 +480,7 @@ namespace ActivosFijos.Controllers
                         }
                         
                         commonBuilder.RenderLeyenda2(document, NumeroEmpleado);
-                        commonBuilder.RenderFirmaReviso(document);
-                        commonBuilder.RenderFirmaRecibio(document, NumeroEmpleado);
+                        commonBuilder.RenderFirmasResguardo(document, NumeroEmpleado);
                         commonBuilder.RenderLeyendaHoja(document, activosProcesados / 20 + 1, totalPages); // Agregar la leyenda de la hoja
 
                         // Actualizar el contador de activos procesados

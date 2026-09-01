@@ -88,39 +88,44 @@ namespace ActivosFijos.Services.Pdf
 
         private static PdfPCell CrearCeldaNumeroSerie(string numeroSerie)
         {
-            var valorSerie = AjustarTextoLargo(numeroSerie ?? "SIN N/S", 12);
-            var fontNumeroSerie = FontFactory.GetFont(FontFactory.HELVETICA, 5);
+            var valorSerie = string.IsNullOrWhiteSpace(numeroSerie) ? "SIN N/S" : numeroSerie.Trim();
+            var baseFont = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.WINANSI, BaseFont.NOT_EMBEDDED);
+            const float anchoDisponible = 76f;
+            const float tamanioMaximo = 5f;
+            const float tamanioMinimo = 3.5f;
+
+            // La fuente se reduce únicamente cuando la serie no cabe en su celda.
+            // Así se conservan los 20 renglones, el número completo y la altura fija.
+            var anchoSerie = baseFont.GetWidthPoint(valorSerie, tamanioMaximo);
+            var tamanioFuente = anchoSerie > anchoDisponible
+                ? Math.Max(tamanioMinimo, tamanioMaximo * anchoDisponible / anchoSerie)
+                : tamanioMaximo;
+
+            if (baseFont.GetWidthPoint(valorSerie, tamanioFuente) > anchoDisponible)
+            {
+                valorSerie = TruncarHastaAncho(valorSerie, baseFont, tamanioFuente, anchoDisponible);
+            }
+
+            var fontNumeroSerie = new Font(baseFont, tamanioFuente, Font.NORMAL);
 
             return new PdfPCell(new Phrase(valorSerie, fontNumeroSerie))
             {
                 HorizontalAlignment = Element.ALIGN_CENTER,
                 VerticalAlignment = Element.ALIGN_MIDDLE,
-                NoWrap = false
+                NoWrap = true
             };
         }
 
-        private static string AjustarTextoLargo(string valor, int longitudPorLinea)
+        private static string TruncarHastaAncho(string valor, BaseFont baseFont, float tamanioFuente, float anchoDisponible)
         {
-            if (string.IsNullOrWhiteSpace(valor))
+            const string indicador = "...";
+            var longitud = valor.Length;
+            while (longitud > 0 && baseFont.GetWidthPoint(valor.Substring(0, longitud) + indicador, tamanioFuente) > anchoDisponible)
             {
-                return "SIN N/S";
+                longitud--;
             }
 
-            valor = valor.Trim();
-
-            if (valor.Length <= longitudPorLinea)
-            {
-                return valor;
-            }
-
-            var partes = new List<string>();
-
-            for (int i = 0; i < valor.Length; i += longitudPorLinea)
-            {
-                partes.Add(valor.Substring(i, Math.Min(longitudPorLinea, valor.Length - i)));
-            }
-
-            return string.Join("\n", partes);
+            return longitud == valor.Length ? valor : valor.Substring(0, longitud) + indicador;
         }
 
         private static void AddEmptyRows(PdfPTable bienesTable, int rowCount)

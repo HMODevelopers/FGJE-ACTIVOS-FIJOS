@@ -363,11 +363,87 @@ namespace ActivosFijos.Services.Pdf
             document.Add(puestoEmpleadoTable);
         }
 
+        // El resguardo requiere que ambas firmas permanezcan en la misma hoja.
+        // A diferencia de las rutinas anteriores, esta tabla se agrega como una
+        // sola unidad, por lo que iTextSharp no puede separar sus renglones entre
+        // dos páginas.
+        public void RenderFirmasResguardo(Document document, int numeroEmpleado)
+        {
+            var idUsuario = SessionHelper.GetUser();
+            var usuario = _db.PLU_CONF_Usuario.FirstOrDefault(x => x.IdUsuario == idUsuario);
+            var empleado = _db.PLU_OP_Empleados.FirstOrDefault(x => x.NumeroEmpleado == numeroEmpleado);
+
+            var firmasTable = new PdfPTable(2)
+            {
+                WidthPercentage = 100,
+                KeepTogether = true,
+                // Llevar el área de firmas hacia la parte baja del formato.
+                SpacingBefore = 75f,
+                SpacingAfter = 0f
+            };
+            firmasTable.SetWidths(new[] { 1f, 1f });
+            firmasTable.AddCell(new PdfPCell(CrearTablaFirma(
+                "Reviso:",
+                (usuario.Apellidos + " " + usuario.Nombres).Trim(),
+                "DEPARTAMENTO DE CONTROL DE INVENTARIOS"))
+            {
+                Border = PdfPCell.NO_BORDER,
+                HorizontalAlignment = Element.ALIGN_CENTER,
+                PaddingTop = 2f,
+                PaddingBottom = 2f
+            });
+            firmasTable.AddCell(new PdfPCell(CrearTablaFirma(
+                "Recibio:",
+                (empleado.ApellidoP + " " + empleado.ApellidoM + " " + empleado.Nombres).Trim(),
+                "FIRMA DEL RESPONSABLE"))
+            {
+                Border = PdfPCell.NO_BORDER,
+                HorizontalAlignment = Element.ALIGN_CENTER,
+                PaddingTop = 2f,
+                PaddingBottom = 2f
+            });
+
+            document.Add(firmasTable);
+        }
+
+        private static PdfPTable CrearTablaFirma(string etiqueta, string nombre, string cargo)
+        {
+            var fontEtiqueta = FontFactory.GetFont(FontFactory.HELVETICA, 7);
+            var fontNombre = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 8);
+            var firmaTable = new PdfPTable(1) { WidthPercentage = 100 };
+
+            firmaTable.AddCell(CrearCeldaFirma(etiqueta, fontEtiqueta, 0f, 3f));
+            // Espacio reservado para la firma manuscrita.
+            firmaTable.AddCell(new PdfPCell(new Phrase(" ", fontEtiqueta))
+            {
+                Border = PdfPCell.NO_BORDER,
+                FixedHeight = 24f
+            });
+            firmaTable.AddCell(CrearCeldaFirma("_______________________________________", fontEtiqueta, 0f, 5f));
+            firmaTable.AddCell(CrearCeldaFirma(nombre, fontNombre, 0f, 3f));
+            firmaTable.AddCell(CrearCeldaFirma(cargo, fontEtiqueta, 0f, 0f));
+
+            return firmaTable;
+        }
+
+        private static PdfPCell CrearCeldaFirma(string texto, Font font, float paddingTop, float paddingBottom)
+        {
+            return new PdfPCell(new Phrase(texto, font))
+            {
+                Border = PdfPCell.NO_BORDER,
+                HorizontalAlignment = Element.ALIGN_CENTER,
+                PaddingTop = paddingTop,
+                PaddingBottom = paddingBottom,
+                NoWrap = true
+            };
+        }
+
         public void RenderLeyendaHoja(Document document, int numeroHoja, int totalHojas)
         {
             Font fontLeyenda = FontFactory.GetFont(FontFactory.HELVETICA, 8, Font.NORMAL, BaseColor.BLACK);
             Paragraph paragraph = new Paragraph($"Hoja {numeroHoja} de {totalHojas}", fontLeyenda);
             paragraph.Alignment = Element.ALIGN_RIGHT;
+            paragraph.SpacingBefore = 5f;
             paragraph.IndentationLeft = 10f;
             paragraph.IndentationRight = 15f;
             document.Add(paragraph);
